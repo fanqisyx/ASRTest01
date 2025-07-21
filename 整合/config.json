@@ -1,0 +1,10 @@
+{
+  "lmstudio_url": "http://localhost:1234/v1/chat/completions",
+  "lmstudio_model": "llm/gguf/qwen3-0.6b-q8_0.gguf",
+  "vosk_model_path": "E:\\AITools\\model\\Vosk\\vosk-model-cn-0.22",
+  "enable_wakeword": true,
+  "wakeword": "小锡",
+  "block_wakeword_after_wake": true,
+  "enable_autostop": true,
+  "autostop_time": "30"
+}
