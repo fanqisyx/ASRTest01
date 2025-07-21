@@ -1,0 +1,23 @@
+【打包说明】
+
+1. 安装依赖（建议在conda base环境下）：
+   pip install -r requirements.txt
+
+2. 打包主程序（推荐PyInstaller）：
+   pyinstaller --noconfirm --onefile --windowed --add-data "config.json;." --add-data "vosk_model_path目录;vosk_model_path目录" main.py
+
+   说明：
+   - --onefile 生成单一可执行文件
+   - --windowed 不弹出命令行窗口（如需调试可去掉）
+   - --add-data 用于包含模型、配置等资源文件
+   - vosk_model_path目录请替换为实际模型路径
+
+3. 打包后可执行文件在dist/目录下。
+
+4. 如需包含全部依赖和模型，建议用zip或7z整体打包dist/及模型目录。
+
+5. 如需自定义图标，可加参数： --icon=your.ico
+
+【注意】
+- 打包前请确保config.json、vosk模型等资源文件在整合目录下。
+- 如遇打包问题可反馈详细报错。
