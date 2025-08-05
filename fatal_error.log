@@ -1,0 +1,393 @@
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 272, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 272, in start_listen
+    import importlib.util, os
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 272, in start_listen
+    import importlib.util, os
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[FATAL] 未捕获异常: No module named 'machine_id'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 277, in start_listen
+    spec.loader.exec_module(license_check_mod)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\加密\license_check.py", line 1, in <module>
+    from machine_id import get_machine_id
+ModuleNotFoundError: No module named 'machine_id'
+
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 22896, 当前线程: 36544)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 9764, 当前线程: 18324)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26372, 当前线程: 22292)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 37616, 当前线程: 21032)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 26736, 当前线程: 20140)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 8792, 当前线程: 2920)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 8792, 当前线程: 2920)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 8792, 当前线程: 2920)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 8792, 当前线程: 2920)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。请提供更多上下文或明确具体操作步骤。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26860, 当前线程: 31536)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 26860, 当前线程: 31536)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 7240, 当前线程: 24104)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 7240, 当前线程: 24104)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 34664, 当前线程: 27980)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 34664, 当前线程: 27980)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 37700, 当前线程: 20084)
+[ERROR] TTS播报异常: pyqtBoundSignal.emit() takes no keyword arguments
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 568, in _process
+    self.tts_signal.emit(tts_text, type=Qt.QueuedConnection)
+TypeError: pyqtBoundSignal.emit() takes no keyword arguments
+
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。请提供更多具体信息以便我更好地帮助您。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 37700, 当前线程: 20084)
+[ERROR] TTS播报异常: pyqtBoundSignal.emit() takes no keyword arguments
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 568, in _process
+    self.tts_signal.emit(tts_text, type=Qt.QueuedConnection)
+TypeError: pyqtBoundSignal.emit() takes no keyword arguments
+
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 37700, 当前线程: 20084)
+[ERROR] TTS播报异常: pyqtBoundSignal.emit() takes no keyword arguments
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 568, in _process
+    self.tts_signal.emit(tts_text, type=Qt.QueuedConnection)
+TypeError: pyqtBoundSignal.emit() takes no keyword arguments
+
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 23696, 当前线程: 5528)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 23696, 当前线程: 5528) self id=2200364564016
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 35872, 当前线程: 33428)
+[ERROR] TTS播报异常: receivers(self, signal: PYQT_SIGNAL): first argument of unbound method must have type 'QObject'
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-15 语音提示词\整合\ui_main.py", line 584, in _process
+    receivers = QObject.receivers(self.tts_signal)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: receivers(self, signal: PYQT_SIGNAL): first argument of unbound method must have type 'QObject'
+
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 25320, 当前线程: 12196)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 25320, 当前线程: 12196) self id=2340400595744
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 3048)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 3048) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 3048)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 3048) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 5872)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 5872) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 5872)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 5872) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer=参数有错误。意图应为"将产品从Y工位拿到A库位"，但当前输入未符合源工位（1-4）和目标库位（5-9）的规则。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 5872)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 5872) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确. 参数有错误., tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 5872)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 5872) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 5872)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 5872) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=True
+[DEBUG] process_next: 开始TTS播报 (主线程: 20760, 当前线程: 5872)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 20760, 当前线程: 5872) self id=2103094395824
+[DEBUG] process_next: TTS播报前参数: answer=参数有错误。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 16968, 当前线程: 25068)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 16968, 当前线程: 25068) self id=2567848821824
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 10768, 当前线程: 35796)
+[DEBUG] process_next: TTS播报信号已发出 (主线程: 10768, 当前线程: 35796) self id=1746446451776
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 9440)
+[DEBUG] process_next: TTS播报前参数: answer=参数有错误。请确认具体操作细节（如源工位、目标库位）。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 33480, 当前线程: 19092)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}：  
+意图不明确。参数"一"和"六"与定义中的"Y工位"和"A库位"存在对应关系，但未涉及具体工位号的转换。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 33480, 当前线程: 19092)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 16440, 当前线程: 17536)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28104, 当前线程: 29284)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 22024, 当前线程: 23284)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 15020, 当前线程: 27376)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 15020, 当前线程: 27376)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 22004, 当前线程: 16300)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 22004, 当前线程: 16300)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 24264, 当前线程: 26756)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"7"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"2","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"3"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer={"id":"Time","source":"3","target":"2"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer={"id":"Time","source":"2","target":"3"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer={"id":"Time","source":"2","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)

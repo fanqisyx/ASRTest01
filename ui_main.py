@@ -1,3 +1,4 @@
+from PyQt5.QtCore import pyqtSignal
 import datetime
 
 import datetime
@@ -43,6 +44,30 @@ class SettingsDialog(QtWidgets.QDialog):
         self.enable_autostop_checkbox = QtWidgets.QCheckBox("启用定时自动停止")
         self.autostop_time_edit = QtWidgets.QLineEdit()
         self.autostop_time_edit.setPlaceholderText("秒数，如30")
+
+        # 加密相关控件（异常时也能显示界面）
+        machine_id_val = ""
+        try:
+            import importlib.util
+            加密_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './加密'))
+            machine_id_path = os.path.join(加密_dir, 'machine_id.py')
+            spec = importlib.util.spec_from_file_location('machine_id', machine_id_path)
+            machine_id_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(machine_id_mod)
+            get_machine_id = machine_id_mod.get_machine_id
+            machine_id_val = get_machine_id()
+        except Exception as e:
+            machine_id_val = f"加载失败: {e}"
+        self.machine_id_edit = QtWidgets.QLineEdit(machine_id_val)
+        self.machine_id_edit.setReadOnly(True)
+        self.btn_copy_machine_id = QtWidgets.QPushButton("复制机器码")
+        self.btn_copy_machine_id.clicked.connect(self.copy_machine_id)
+        self.pubkey_path_edit = QtWidgets.QLineEdit("public.pem")
+        self.license_path_edit = QtWidgets.QLineEdit("license.lic")
+        self.btn_check_license = QtWidgets.QPushButton("验证许可证")
+        self.btn_check_license.clicked.connect(self.check_license_action)
+        self.license_status_label = QtWidgets.QLabel("")
+
         self.load_config()
         self.sync_config_to_ui()
 
@@ -78,11 +103,37 @@ class SettingsDialog(QtWidgets.QDialog):
         self.layout.addRow(self.block_wakeword_after_wake_checkbox)
         self.layout.addRow(self.enable_autostop_checkbox)
         self.layout.addRow("定时自动停止(秒):", self.autostop_time_edit)
+
+        # 加密相关控件布局
+        self.layout.addRow("本机机器码:", self.machine_id_edit)
+        self.layout.addRow("", self.btn_copy_machine_id)
+        self.layout.addRow("公钥路径:", self.pubkey_path_edit)
+        self.layout.addRow("许可文件路径:", self.license_path_edit)
+        self.layout.addRow("", self.btn_check_license)
+        self.layout.addRow("许可证状态:", self.license_status_label)
+
         btn_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         btn_box.accepted.connect(self.accept)
         btn_box.rejected.connect(self.reject)
         self.layout.addWidget(btn_box)
         self.setLayout(self.layout)
+    def copy_machine_id(self):
+        clipboard = QtWidgets.QApplication.clipboard()
+        clipboard.setText(self.machine_id_edit.text())
+        QtWidgets.QMessageBox.information(self, "复制成功", "机器码已复制到剪贴板！")
+
+    def check_license_action(self):
+        pubkey_path = self.pubkey_path_edit.text()
+        license_path = self.license_path_edit.text()
+        import importlib.util, os
+        加密_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './加密'))
+        license_check_path = os.path.join(加密_dir, 'license_check.py')
+        spec = importlib.util.spec_from_file_location('license_check', license_check_path)
+        license_check_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(license_check_mod)
+        check_license = license_check_mod.check_license
+        result = check_license(license_path, pubkey_path)
+        self.license_status_label.setText(result.get('msg', '未知'))
 
     def load_config(self):
         config = SettingsDialog.read_config()
@@ -105,8 +156,14 @@ class SettingsDialog(QtWidgets.QDialog):
 
 # MainWindow主界面类，包含所有主流程和UI逻辑
 class MainWindow(QtWidgets.QWidget):
+    tts_signal = pyqtSignal(str)
     def __init__(self):
         super().__init__()
+        log_with_time(f"[TTS] MainWindow.__init__: self id={id(self)}")
+        # 强制使用队列连接确保跨线程信号正常工作
+        from PyQt5.QtCore import Qt
+        connection_result = self.tts_signal.connect(self._tts_on_main_thread, Qt.QueuedConnection)
+        log_with_time(f"[TTS] MainWindow.__init__: signal connect result={connection_result} (使用QueuedConnection)")
         self.setWindowTitle("语音助手整合Demo")
         self.voice_queue = queue.Queue()
         self.voice_history = []
@@ -120,6 +177,77 @@ class MainWindow(QtWidgets.QWidget):
         self.autostop_timer = None
         self.init_ui()
         self.load_config()
+        # 测试信号槽连接
+        self.test_signal_connection()
+
+    def _safe_speak(self, text):
+        """安全的TTS播报方法，用于唤醒回复等简短文本"""
+        try:
+            log_with_time(f"[TTS] _safe_speak: 播报: {text}")
+            import subprocess
+            
+            # 转义文本
+            escaped_text = text.replace('"', '""')
+            
+            # 使用修复后的PowerShell命令
+            ps_cmd = f'''Add-Type -AssemblyName System.Speech; $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer; $synth.SelectVoiceByHints([System.Speech.Synthesis.VoiceGender]::NotSet, [System.Speech.Synthesis.VoiceAge]::NotSet, 0, [System.Globalization.CultureInfo]::CreateSpecificCulture("zh-CN")); $synth.Speak("{escaped_text}"); $synth.Dispose()'''
+            
+            result = subprocess.run(
+                ["powershell", "-Command", ps_cmd],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+            
+            if result.returncode == 0:
+                log_with_time(f"[TTS] _safe_speak: 播报完成: {text}")
+            else:
+                # 备选：使用系统提示音
+                import winsound
+                winsound.MessageBeep(winsound.MB_ICONINFORMATION)
+                log_with_time(f"[TTS] _safe_speak: 使用提示音替代: {text}")
+                
+        except Exception as e:
+            log_with_time(f"[TTS] _safe_speak: 播报异常: {e}")
+    
+    def test_signal_connection(self):
+        """测试信号槽连接是否正常"""
+        log_with_time(f"[TTS] test_signal_connection: 开始测试信号槽, self id={id(self)}")
+        try:
+            self.tts_signal.emit("测试信号")
+            log_with_time(f"[TTS] test_signal_connection: 测试信号已发出")
+        except Exception as e:
+            log_with_time(f"[TTS] test_signal_connection: 测试信号发出异常: {e}")
+
+    def _tts_on_main_thread(self, text):
+        from tts_module import speak_text_interruptable
+        import time
+        try:
+            log_with_time(f"[TTS] _tts_on_main_thread: 进入函数, text={text}, self id={id(self)}")
+            log_with_time("[TTS] _tts_on_main_thread: 设置listen_pause，暂停收音")
+            self.listen_pause.set()
+            log_with_time("[TTS] _tts_on_main_thread: 调用speak_text_interruptable")
+            speak_text_interruptable(text, self.tts_stop_event)
+            log_with_time("[TTS] _tts_on_main_thread: speak_text_interruptable返回，准备估算延迟")
+            # 估算TTS朗读时长，rate=200字/分钟（pyttsx3默认），加0.3秒缓冲
+            char_count = len(text)
+            log_with_time(f"[TTS] _tts_on_main_thread: 字符数={char_count}")
+            chars_per_second = 200 / 60
+            estimated = char_count / chars_per_second + 0.3
+            log_with_time(f"[TTS] _tts_on_main_thread: 朗读结束，延迟{estimated:.2f}秒后恢复收音")
+            time.sleep(estimated)
+            log_with_time("[TTS] _tts_on_main_thread: 延迟结束，准备恢复收音")
+            self.listen_pause.clear()
+            log_with_time("[TTS] _tts_on_main_thread: 已恢复收音")
+            # 确保状态指示灯正确更新
+            if self.listening:
+                self.set_status_light(True)
+                log_with_time("[TTS] _tts_on_main_thread: 收音状态指示灯已更新")
+        except Exception as e:
+            import traceback
+            tb = traceback.format_exc()
+            log_with_time(f"[TTS] _tts_on_main_thread: 异常: {e}\n{tb}")
 
     # 以下方法直接复用原SettingsDialog的相关方法
     def init_ui(self):
@@ -216,23 +344,59 @@ class MainWindow(QtWidgets.QWidget):
 
 
     def start_listen(self):
-        if self.listening:
-            return
-        with self.process_lock:
-            self.processing = False
-        self.tts_stop_event.clear()
-        self.listening = True
-        self.wake_state = 'idle'
-        self.set_status_light(False)
-        self.btn_start.setEnabled(False)
-        self.btn_stop.setEnabled(True)
-        msg = f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [系统] 开始聆听（{'唤醒词模式' if self.enable_wakeword else '普通模式'}）..."
-        self.append_text(msg)
-        log_with_time(msg)
-        self.listen_thread = threading.Thread(target=self.listen_loop, daemon=True)
-        self.listen_thread.start()
-        if not self.enable_wakeword:
-            self.process_next()
+        import traceback
+        try:
+            if self.listening:
+                return
+            # 许可校验（调用加密文件夹的check_license）
+            import importlib.util, os
+            加密_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './加密'))
+            license_check_path = os.path.join(加密_dir, 'license_check.py')
+            spec = importlib.util.spec_from_file_location('license_check', license_check_path)
+            license_check_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(license_check_mod)
+            check_license = license_check_mod.check_license
+            # 许可路径和公钥路径，优先用设置页配置，否则用默认
+            license_path = getattr(self, 'license_path', 'license.lic')
+            pubkey_path = getattr(self, 'pubkey_path', 'public.pem')
+            # 若主界面未设置，可尝试SettingsDialog默认值
+            try:
+                from PyQt5.QtWidgets import QApplication
+                # 尝试获取设置页内容
+                dlg = SettingsDialog()
+                license_path = dlg.license_path_edit.text() or license_path
+                pubkey_path = dlg.pubkey_path_edit.text() or pubkey_path
+            except Exception:
+                pass
+            result = check_license(license_path, pubkey_path)
+            if result['status'] == 'expired':
+                QtWidgets.QMessageBox.warning(self, "许可证过期", result.get('msg', '您的许可证已过期，请联系管理员。'))
+                self.listening = False
+                self.processing = False
+                self.set_status_light(False)
+                self.btn_start.setEnabled(True)
+                self.btn_stop.setEnabled(False)
+                return
+            with self.process_lock:
+                self.processing = False
+            self.tts_stop_event.clear()
+            self.listening = True
+            self.wake_state = 'idle'
+            self.set_status_light(False)
+            self.btn_start.setEnabled(False)
+            self.btn_stop.setEnabled(True)
+            msg = f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [系统] 开始聆听（{'唤醒词模式' if self.enable_wakeword else '普通模式'}）..."
+            self.append_text(msg)
+            log_with_time(msg)
+            self.listen_thread = threading.Thread(target=self.listen_loop, daemon=True)
+            self.listen_thread.start()
+            if not self.enable_wakeword:
+                self.process_next()
+        except Exception as e:
+            tb = traceback.format_exc()
+            log_with_time(f"[FATAL] start_listen异常: {e}\n{tb}")
+            with open("fatal_error.log", "a", encoding="utf-8") as f:
+                f.write(f"[FATAL] start_listen异常: {e}\n{tb}\n")
 
     def stop_listen(self):
         self.listening = False
@@ -251,73 +415,82 @@ class MainWindow(QtWidgets.QWidget):
         log_with_time(msg)
 
     def listen_loop(self):
-        import vosk_module
-        self.set_status_light(False)
-        wakeword_pinyin = self._normalize_pinyin(self.wakeword) if self.enable_wakeword else None
-        while self.listening:
-            if self.listen_pause.is_set():
-                time.sleep(0.1)
-                continue
-            self.listen_stop_event.clear()
-            self.set_status_light(True)
-            text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
-            if not self.listening:
-                break
-            nowstr = datetime.datetime.now().strftime('%H:%M:%S')
-            # 只收到1个字时，视为噪音，丢弃
-            if text and len(text.strip()) == 1:
-                continue
-            if text:
-                self.voice_history.append((nowstr, text))
-                self.update_queue_list()
-            if self.enable_wakeword:
-                if self.wake_state == 'idle':
-                    if text:
-                        text_pinyin = self._normalize_pinyin(text)
-                        if wakeword_pinyin and wakeword_pinyin in text_pinyin:
-                            self.wake_state = 'waked'
-                            self.append_text(f"[{nowstr}] [系统] 检测到唤醒词，已唤醒")
-                            log_with_time("[系统] 检测到唤醒词，已唤醒")
-                            self._start_autostop_timer()  # 唤醒后立即启动倒计时
-                            self.listen_discard_event.set()
-                            self.set_status_light(False)
-                            speak_text_interruptable("你好！", self.tts_stop_event)
-                            self.listen_discard_event.clear()
-                            if self.listening:
-                                self.set_status_light(True)
-                            if not self.block_wakeword_after_wake:
-                                if not self.processing and self.voice_queue.empty():
-                                    self.voice_queue.put(text)
-                                    self.process_next()
-                elif self.wake_state == 'waked':
-                    if self.block_wakeword_after_wake:
-                        if text and not self.listen_discard_event.is_set():
-                            # 无论processing状态如何都推送，保证多轮对话
-                            self.voice_queue.put(text)
-                            self.process_next()
-                    else:
+        import traceback
+        try:
+            import vosk_module
+            self.set_status_light(False)
+            wakeword_pinyin = self._normalize_pinyin(self.wakeword) if self.enable_wakeword else None
+            while self.listening:
+                if self.listen_pause.is_set():
+                    time.sleep(0.1)
+                    continue
+                self.listen_stop_event.clear()
+                self.set_status_light(True)
+                text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+                if not self.listening:
+                    break
+                nowstr = datetime.datetime.now().strftime('%H:%M:%S')
+                # 只收到1个字时，视为噪音，丢弃
+                if text and len(text.strip()) == 1:
+                    continue
+                if text:
+                    self.voice_history.append((nowstr, text))
+                    self.update_queue_list()
+                if self.enable_wakeword:
+                    if self.wake_state == 'idle':
                         if text:
                             text_pinyin = self._normalize_pinyin(text)
                             if wakeword_pinyin and wakeword_pinyin in text_pinyin:
+                                self.wake_state = 'waked'
                                 self.append_text(f"[{nowstr}] [系统] 检测到唤醒词，已唤醒")
                                 log_with_time("[系统] 检测到唤醒词，已唤醒")
+                                self._start_autostop_timer()  # 唤醒后立即启动倒计时
                                 self.listen_discard_event.set()
                                 self.set_status_light(False)
-                                speak_text_interruptable("你好！", self.tts_stop_event)
+                                # 使用安全的系统TTS播报唤醒回复
+                                self._safe_speak("你好！")
                                 self.listen_discard_event.clear()
                                 if self.listening:
                                     self.set_status_light(True)
-                            else:
-                                if text and not self.listen_discard_event.is_set():
+                                if not self.block_wakeword_after_wake:
                                     if not self.processing and self.voice_queue.empty():
                                         self.voice_queue.put(text)
                                         self.process_next()
-            else:
-                if text and not self.listen_discard_event.is_set():
-                    if not self.processing and self.voice_queue.empty():
-                        self.voice_queue.put(text)
-                        self.process_next()
-            time.sleep(0.1)
+                    elif self.wake_state == 'waked':
+                        if self.block_wakeword_after_wake:
+                            if text and not self.listen_discard_event.is_set():
+                                # 无论processing状态如何都推送，保证多轮对话
+                                self.voice_queue.put(text)
+                                self.process_next()
+                        else:
+                            if text:
+                                text_pinyin = self._normalize_pinyin(text)
+                                if wakeword_pinyin and wakeword_pinyin in text_pinyin:
+                                    self.append_text(f"[{nowstr}] [系统] 检测到唤醒词，已唤醒")
+                                    log_with_time("[系统] 检测到唤醒词，已唤醒")
+                                    self.listen_discard_event.set()
+                                    self.set_status_light(False)
+                                    # 使用安全的系统TTS播报唤醒回复
+                                    self._safe_speak("你好！")
+                                    self.listen_discard_event.clear()
+                                    if self.listening:
+                                        self.set_status_light(True)
+                                else:
+                                    if text and not self.listen_discard_event.is_set():
+                                        if not self.processing and self.voice_queue.empty():
+                                            self.voice_queue.put(text)
+                                            self.process_next()
+                else:
+                    if text and not self.listen_discard_event.is_set():
+                        if not self.processing and self.voice_queue.empty():
+                            self.voice_queue.put(text)
+                            self.process_next()
+                time.sleep(0.1)
+        except Exception as e:
+            tb = traceback.format_exc()
+            log_with_time(f"[FATAL] listen_loop异常: {e}\n{tb}")
+            with open("fatal_error.log", "a", encoding="utf-8") as f:
+                f.write(f"[FATAL] listen_loop异常: {e}\n{tb}\n")
 
     def _normalize_pinyin(self, text):
         py = lazy_pinyin(text)
@@ -422,18 +595,111 @@ class MainWindow(QtWidgets.QWidget):
                             self.listen_discard_event.set()
                             self.set_status_light(False)
                             import threading, traceback, sys
+                            import json
                             try:
+                                log_with_time(f"[DEBUG] process_next: TTS播报前参数: answer={answer}, tts_stop_event={self.tts_stop_event.is_set()}")
                                 log_with_time(f"[DEBUG] process_next: 开始TTS播报 (主线程: {threading.main_thread().ident}, 当前线程: {threading.current_thread().ident})")
-                                speak_text_interruptable(answer, self.tts_stop_event)
-                                log_with_time(f"[DEBUG] process_next: TTS播报结束 (主线程: {threading.main_thread().ident}, 当前线程: {threading.current_thread().ident})")
+                                import os
+                                with open("fatal_error.log", "a", encoding="utf-8") as f:
+                                    f.write(f"[DEBUG] process_next: TTS播报前参数: answer={answer}, tts_stop_event={self.tts_stop_event.is_set()}\n")
+                                    f.write(f"[DEBUG] process_next: 开始TTS播报 (主线程: {threading.main_thread().ident}, 当前线程: {threading.current_thread().ident})\n")
+                                # 新增：如为JSON，写入txt并只播报“命令已收到”
+                                tts_text = answer
+                                try:
+                                    parsed = json.loads(answer)
+                                    with open("model_command.txt", "w", encoding="utf-8") as f:
+                                        f.write(answer)
+                                    tts_text = "命令已收到"
+                                    log_with_time("[DEBUG] process_next: answer为JSON，已写入model_command.txt，仅播报命令已收到")
+                                except Exception:
+                                    pass
+                                # 用Qt信号让TTS在主线程执行
+                                log_with_time(f"[DEBUG] process_next: emit前 self id={id(self)}")
+                                log_with_time(f"[DEBUG] process_next: signal类型={type(self.tts_signal)}")
+                                log_with_time(f"[DEBUG] process_next: 当前线程是否为主线程={threading.current_thread() == threading.main_thread()}")
+                                
+                                # 放弃Qt信号机制，直接在工作线程中调用TTS（使用线程安全方式）
+                                log_with_time(f"[DEBUG] process_next: Qt信号失效，改用直接调用方式")
+                                log_with_time(f"[DEBUG] process_next: 直接调用TTS函数")
+                                
+                                # 直接调用TTS函数（使用系统TTS，更稳定）
+                                import threading
+                                def safe_tts_call():
+                                    try:
+                                        log_with_time(f"[TTS] safe_tts_call: 开始TTS播报, text={tts_text}")
+                                        log_with_time("[TTS] safe_tts_call: 设置listen_pause，暂停收音")
+                                        self.listen_pause.set()
+                                        log_with_time("[TTS] safe_tts_call: 使用系统TTS播报")
+                                        
+                                        # 使用Windows系统SAPI语音引擎，避免pyttsx3崩溃问题
+                                        import time
+                                        import subprocess
+                                        try:
+                                            # 方法1：使用PowerShell的SAPI语音合成
+                                            log_with_time("[TTS] safe_tts_call: 使用PowerShell SAPI TTS")
+                                            # 转义文本中的特殊字符
+                                            escaped_text = tts_text.replace('"', '""').replace("'", "''")
+                                            ps_cmd = f'''Add-Type -AssemblyName System.Speech; $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer; $synth.SelectVoiceByHints([System.Speech.Synthesis.VoiceGender]::NotSet, [System.Speech.Synthesis.VoiceAge]::NotSet, 0, [System.Globalization.CultureInfo]::CreateSpecificCulture("zh-CN")); $synth.Speak("{escaped_text}"); $synth.Dispose()'''
+                                            
+                                            log_with_time(f"[TTS] safe_tts_call: 执行PowerShell命令播报: {tts_text}")
+                                            result = subprocess.run(
+                                                ["powershell", "-Command", ps_cmd],
+                                                capture_output=True,
+                                                text=True,
+                                                timeout=30,  # 30秒超时
+                                                creationflags=subprocess.CREATE_NO_WINDOW  # 不显示PowerShell窗口
+                                            )
+                                            
+                                            if result.returncode == 0:
+                                                log_with_time("[TTS] safe_tts_call: PowerShell TTS播放完成")
+                                            else:
+                                                raise Exception(f"PowerShell TTS失败: {result.stderr}")
+                                                
+                                        except Exception as tts_e:
+                                            log_with_time(f"[TTS] safe_tts_call: PowerShell TTS异常: {tts_e}")
+                                            # 方法2：fallback到简单的系统提示音
+                                            try:
+                                                log_with_time("[TTS] safe_tts_call: 使用系统提示音作为备选")
+                                                import winsound
+                                                # 播放系统提示音表示有消息
+                                                winsound.MessageBeep(winsound.MB_ICONINFORMATION)
+                                                log_with_time(f"[TTS] safe_tts_call: 系统提示音播放完成，内容: {tts_text}")
+                                            except Exception as beep_e:
+                                                log_with_time(f"[TTS] safe_tts_call: 系统提示音也失败: {beep_e}")
+                                        
+                                        log_with_time("[TTS] safe_tts_call: TTS处理完成，准备估算延迟")
+                                        # 估算TTS朗读时长，rate=200字/分钟（中文语音），加0.5秒缓冲
+                                        char_count = len(tts_text)
+                                        log_with_time(f"[TTS] safe_tts_call: 字符数={char_count}")
+                                        chars_per_second = 200 / 60  # 每秒约3.33个字符
+                                        estimated = char_count / chars_per_second + 0.5
+                                        log_with_time(f"[TTS] safe_tts_call: 延迟{estimated:.2f}秒后恢复收音")
+                                        time.sleep(estimated)
+                                        log_with_time("[TTS] safe_tts_call: 延迟结束，准备恢复收音")
+                                        self.listen_pause.clear()
+                                        log_with_time("[TTS] safe_tts_call: 已恢复收音")
+                                        # 确保状态指示灯正确更新
+                                        if self.listening:
+                                            log_with_time("[TTS] safe_tts_call: 尝试更新状态指示灯")
+                                    except Exception as e:
+                                        import traceback
+                                        tb = traceback.format_exc()
+                                        log_with_time(f"[TTS] safe_tts_call: 异常: {e}\n{tb}")
+                                        # 异常时也要恢复收音
+                                        self.listen_pause.clear()
+                                
+                                # 在当前线程中直接调用（避免创建新线程）
+                                safe_tts_call()
+                                log_with_time("[DEBUG] process_next: TTS直接调用完成")
                             except Exception as e:
                                 tb = traceback.format_exc()
                                 log_with_time(f"[ERROR] TTS播报异常: {e}\n{tb}")
+                                with open("fatal_error.log", "a", encoding="utf-8") as f:
+                                    f.write(f"[ERROR] TTS播报异常: {e}\n{tb}\n")
                                 self.append_text(f"[{nowstr()}] [系统] TTS播报异常: {e}")
                             self.listen_discard_event.clear()
-                            self.listen_pause.clear()
-                            if self.listening:
-                                self.set_status_light(True)
+                            # TTS已由safe_tts_call完全处理，包括收音恢复
+                            log_with_time("[DEBUG] process_next: TTS处理完成，状态已由TTS函数管理")
                             # TTS播报后重启倒计时
                             try:
                                 log_with_time("[DEBUG] process_next: TTS播报后重启倒计时")
