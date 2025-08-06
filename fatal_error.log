@@ -391,3 +391,63 @@ TypeError: receivers(self, signal: PYQT_SIGNAL): first argument of unbound metho
 [DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
 [DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
 [DEBUG] process_next: 开始TTS播报 (主线程: 36364, 当前线程: 12164)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 18572, 当前线程: 35196)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 18572, 当前线程: 35196)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 18572, 当前线程: 35196)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"2"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 18732, 当前线程: 26268)

@@ -169,6 +169,7 @@ class MainWindow(QtWidgets.QWidget):
         self.voice_history = []
         self.listening = False
         self.processing = False
+        self._processing_lock = threading.Lock()  # 新增：防止并发处理
         self.listen_pause = threading.Event()
         self.listen_stop_event = threading.Event()
         self.listen_discard_event = threading.Event()
@@ -210,6 +211,71 @@ class MainWindow(QtWidgets.QWidget):
                 
         except Exception as e:
             log_with_time(f"[TTS] _safe_speak: 播报异常: {e}")
+    
+    def _pause_listening(self):
+        """暂停语音识别"""
+        self.listen_discard_event.set()
+        self.listen_pause.set()
+        self.set_status_light(False)
+        log_with_time("[DEBUG] 语音识别已暂停")
+
+    def _resume_listening(self):
+        """恢复语音识别"""
+        self.listen_discard_event.clear()
+        self.listen_pause.clear()
+        if self.listening:
+            self.set_status_light(True)
+            try:
+                self._start_autostop_timer()
+            except Exception as e:
+                log_with_time(f"[ERROR] 恢复监听时启动定时器失败: {e}")
+        log_with_time("[DEBUG] 语音识别已恢复")
+
+    def _update_display(self, thinking, answer):
+        """更新界面显示"""
+        def nowstr():
+            return datetime.datetime.now().strftime("%H:%M:%S")
+        
+        if thinking:
+            msg_think = f"[{nowstr()}] [思考] {thinking}"
+            self.append_text(msg_think)
+            log_with_time(f"[思考] {thinking}")
+        
+        msg_ai = f"[{nowstr()}] [AI] {answer}"
+        self.append_text(msg_ai)
+        log_with_time(f"[AI] {answer}")
+
+    def _prepare_tts_text(self, answer):
+        """准备TTS播报文本，处理JSON命令"""
+        tts_text = answer
+        try:
+            parsed = json.loads(answer)
+            with open("model_command.txt", "w", encoding="utf-8") as f:
+                f.write(answer)
+            tts_text = "命令已收到"
+            log_with_time("[DEBUG] answer为JSON，已写入model_command.txt，仅播报命令已收到")
+        except Exception:
+            pass  # 不是JSON，正常处理
+        return tts_text
+
+    def _execute_tts_with_state_management(self, tts_text):
+        """执行TTS播报并管理状态"""
+        def tts_completion_callback():
+            """TTS完成后的回调"""
+            try:
+                # 估算额外等待时间
+                time.sleep(0.5)
+                
+                # 恢复语音识别状态
+                self._resume_listening()
+                
+                log_with_time("[DEBUG] TTS播报完成，状态已恢复")
+            except Exception as e:
+                log_with_time(f"[ERROR] TTS回调异常: {e}")
+        
+        # 使用改进的TTS管理器
+        from tts_module import speak_text_safe
+        speak_text_safe(tts_text, callback=tts_completion_callback)
     
     def test_signal_connection(self):
         """测试信号槽连接是否正常"""
@@ -402,14 +468,25 @@ class MainWindow(QtWidgets.QWidget):
         self.listening = False
         self.processing = False
         self.tts_stop_event.set()
+        
+        # 停止当前TTS播报
+        from tts_module import stop_tts
+        stop_tts()
+        
         self.set_status_light(False)
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
         self.wake_state = 'idle'
+        
+        # 重置状态
+        self.listen_discard_event.clear()
+        self.listen_pause.clear()
+        
         # 停止倒计时线程，清空label
         self.label_countdown.setText("")
         if hasattr(self, '_countdown_timer') and self._countdown_timer:
             self._countdown_timer.cancel()
+        
         msg = f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [系统] 已停止聆听。"
         self.append_text(msg)
         log_with_time(msg)

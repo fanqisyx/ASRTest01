@@ -1,80 +1,140 @@
 import threading
-tts_lock = threading.Lock()
-# TTS模块
+import queue
+import time
+import traceback
+from typing import Optional
 import pyttsx3
 
+
+class TTSManager:
+    def __init__(self):
+        self._engine = None
+        self._tts_thread = None
+        self._tts_queue = queue.Queue()
+        self._stop_event = threading.Event()
+        self._current_task = None
+        self._init_engine()
+        self._start_worker()
+    
+    def _init_engine(self):
+        """只初始化一次TTS引擎"""
+        if self._engine is None:
+            try:
+                self._engine = pyttsx3.init()
+                voices = self._engine.getProperty('voices')
+                for voice in voices:
+                    if any(keyword in voice.name.lower() 
+                          for keyword in ["chinese", "huihui", "lili", "ting-ting"]):
+                        self._engine.setProperty('voice', voice.id)
+                        print(f"[TTS] 选中voice: {voice.name}")
+                        break
+            except Exception as e:
+                print(f"[TTS] 初始化引擎失败: {e}")
+                self._engine = None
+    
+    def _start_worker(self):
+        """启动TTS工作线程"""
+        if self._tts_thread is None or not self._tts_thread.is_alive():
+            self._tts_thread = threading.Thread(target=self._worker_loop, daemon=True)
+            self._tts_thread.start()
+    
+    def _worker_loop(self):
+        """TTS工作循环，避免并发问题"""
+        while not self._stop_event.is_set():
+            try:
+                task = self._tts_queue.get(timeout=1)
+                if task is None:  # 退出信号
+                    break
+                
+                text, callback, stop_event = task
+                self._current_task = task
+                
+                if stop_event and stop_event.is_set():
+                    continue
+                
+                # 执行TTS播报
+                if self._engine:
+                    try:
+                        print(f"[TTS] 开始播报: {text}")
+                        self._engine.say(text)
+                        self._engine.runAndWait()
+                        print(f"[TTS] 播报完成: {text}")
+                    except Exception as e:
+                        print(f"[TTS] 播报异常: {e}")
+                        # 重新初始化引擎
+                        self._init_engine()
+                
+                # 调用完成回调
+                if callback:
+                    try:
+                        callback()
+                    except Exception as e:
+                        print(f"[TTS] 回调异常: {e}")
+                
+            except queue.Empty:
+                continue
+            except Exception as e:
+                print(f"[TTS] 工作循环异常: {e}")
+            finally:
+                self._current_task = None
+    
+    def speak(self, text: str, callback=None, stop_event=None):
+        """添加TTS任务到队列"""
+        if not self._stop_event.is_set():
+            self._tts_queue.put((text, callback, stop_event))
+    
+    def stop_current(self):
+        """停止当前TTS播报"""
+        # 清空队列
+        while not self._tts_queue.empty():
+            try:
+                self._tts_queue.get_nowait()
+            except queue.Empty:
+                break
+        
+        # 重新初始化引擎来强制停止
+        if self._engine:
+            try:
+                self._engine.stop()
+            except:
+                pass
+        self._init_engine()
+    
+    def shutdown(self):
+        """关闭TTS管理器"""
+        self._stop_event.set()
+        self._tts_queue.put(None)  # 发送退出信号
+        if self._tts_thread:
+            self._tts_thread.join(timeout=2)
+
+
+# 全局TTS管理器实例
+_tts_manager = TTSManager()
+
+def speak_text_safe(text, callback=None, stop_event=None):
+    """安全的TTS播报函数"""
+    _tts_manager.speak(text, callback, stop_event)
+
+def stop_tts():
+    """停止当前TTS"""
+    _tts_manager.stop_current()
 
 def speak_text(text):
     """
     用TTS朗读文本，优先使用中文语音。
+    保持向后兼容。
     """
-    import traceback
-    try:
-        print(f"[TTS] 尝试获取tts_lock... text={text}")
-        with tts_lock:
-            print(f"[TTS] 已获得tts_lock，初始化pyttsx3...")
-            engine = pyttsx3.init()
-            print(f"[TTS] pyttsx3初始化完成，获取voices...")
-            voices = engine.getProperty('voices')
-            for voice in voices:
-                print(f"[TTS] 检查voice: {voice.name}")
-                if "chinese" in voice.name.lower() or "huihui" in voice.name.lower() or "lili" in voice.name.lower() or "ting-ting" in voice.name.lower():
-                    engine.setProperty('voice', voice.id)
-                    print(f"[TTS] 选中voice: {voice.name}")
-                    break
-            print(f"[TTS] 开始say: {text}")
-            engine.say(text)
-            print(f"[TTS] say完成，runAndWait...")
-            engine.runAndWait()
-            print(f"[TTS] runAndWait完成")
-    except Exception as e:
-        tb = traceback.format_exc()
-        print(f"[FATAL] speak_text异常: {e}\n{tb}")
-        with open("fatal_error.log", "a", encoding="utf-8") as f:
-            f.write(f"[FATAL] speak_text异常: {e}\n{tb}\n")
+    speak_text_safe(text)
 
 def speak_text_interruptable(text, stop_event):
     """
     用TTS朗读文本，支持stop_event.set()时中断。
-    注意：pyttsx3本身不支持强制中断，只能通过分句朗读+轮询stop_event实现近似中断。
+    使用改进的TTS管理器实现。
     """
-    import traceback
     try:
-        print(f"[TTS] 尝试获取tts_lock... text={text}")
-        with tts_lock:
-            print(f"[TTS] 已获得tts_lock，初始化pyttsx3...")
-            engine = pyttsx3.init()
-            print(f"[TTS] pyttsx3初始化完成，获取voices...")
-            voices = engine.getProperty('voices')
-            for voice in voices:
-                print(f"[TTS] 检查voice: {voice.name}")
-                if "chinese" in voice.name.lower() or "huihui" in voice.name.lower() or "lili" in voice.name.lower() or "ting-ting" in voice.name.lower():
-                    engine.setProperty('voice', voice.id)
-                    print(f"[TTS] 选中voice: {voice.name}")
-                    break
-            # 按标点分句朗读，朗读前检测stop_event
-            import re
-            print(f"[TTS] 分句... text={text}")
-            sentences = re.split(r'(。|！|？|\.|!|\?)', text)
-            # 合并分隔符
-            chunks = []
-            for i in range(0, len(sentences)-1, 2):
-                chunks.append(sentences[i] + sentences[i+1])
-            if len(sentences) % 2 == 1:
-                chunks.append(sentences[-1])
-            print(f"[TTS] 分句结果: {chunks}")
-            for chunk in chunks:
-                if stop_event.is_set():
-                    print(f"[TTS] stop_event已设置，中断TTS")
-                    break
-                print(f"[TTS] 开始say: {chunk}")
-                engine.say(chunk)
-                print(f"[TTS] say完成，runAndWait...")
-                engine.runAndWait()
-                print(f"[TTS] runAndWait完成")
+        speak_text_safe(text, stop_event=stop_event)
     except Exception as e:
         tb = traceback.format_exc()
         print(f"[FATAL] speak_text_interruptable异常: {e}\n{tb}")
         with open("fatal_error.log", "a", encoding="utf-8") as f:
             f.write(f"[FATAL] speak_text_interruptable异常: {e}\n{tb}\n")
-    engine.stop()
