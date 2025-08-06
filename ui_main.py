@@ -10,7 +10,7 @@ import re
 import queue
 from PyQt5 import QtWidgets, QtCore, QtGui
 from vosk_module import recognize_speech
-from tts_module import speak_text
+from tts_module import speak_text, speak_text_safe
 try:
     from tts_module import speak_text_interruptable
 except ImportError:
@@ -25,134 +25,26 @@ def log_with_time(msg):
     print(f"[{t}] {msg}")
 
 
-
-
-
-# SettingsDialog保留为设置对话框
-class SettingsDialog(QtWidgets.QDialog):
+class LightIndicator(QtWidgets.QWidget):
+    """状态指示灯组件"""
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("设置")
-        self.layout = QtWidgets.QFormLayout()
-        self.lmstudio_url_edit = QtWidgets.QLineEdit()
-        self.lmstudio_model_edit = QtWidgets.QLineEdit()
-        self.vosk_model_path_edit = QtWidgets.QLineEdit()
-        self.enable_wakeword_checkbox = QtWidgets.QCheckBox("启用唤醒词识别")
-        self.wakeword_edit = QtWidgets.QLineEdit()
-        self.wakeword_edit.setPlaceholderText("如：你好小明")
-        self.block_wakeword_after_wake_checkbox = QtWidgets.QCheckBox("唤醒后屏蔽唤醒词（对话期间不再检测唤醒词）")
-        self.enable_autostop_checkbox = QtWidgets.QCheckBox("启用定时自动停止")
-        self.autostop_time_edit = QtWidgets.QLineEdit()
-        self.autostop_time_edit.setPlaceholderText("秒数，如30")
+        self.setFixedSize(16, 16)
+        self.is_active = False
+    
+    def set_active(self, active):
+        self.is_active = active
+        self.update()
+    
+    def paintEvent(self, event):
+        from PyQt5.QtGui import QPainter, QColor
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        color = "#00FF00" if self.is_active else "#AAAAAA"
+        painter.setBrush(QColor(color))
+        painter.setPen(QtCore.Qt.NoPen)
+        painter.drawEllipse(0, 0, 16, 16)
 
-        # 加密相关控件（异常时也能显示界面）
-        machine_id_val = ""
-        try:
-            import importlib.util
-            加密_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './加密'))
-            machine_id_path = os.path.join(加密_dir, 'machine_id.py')
-            spec = importlib.util.spec_from_file_location('machine_id', machine_id_path)
-            machine_id_mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(machine_id_mod)
-            get_machine_id = machine_id_mod.get_machine_id
-            machine_id_val = get_machine_id()
-        except Exception as e:
-            machine_id_val = f"加载失败: {e}"
-        self.machine_id_edit = QtWidgets.QLineEdit(machine_id_val)
-        self.machine_id_edit.setReadOnly(True)
-        self.btn_copy_machine_id = QtWidgets.QPushButton("复制机器码")
-        self.btn_copy_machine_id.clicked.connect(self.copy_machine_id)
-        self.pubkey_path_edit = QtWidgets.QLineEdit("public.pem")
-        self.license_path_edit = QtWidgets.QLineEdit("license.lic")
-        self.btn_check_license = QtWidgets.QPushButton("验证许可证")
-        self.btn_check_license.clicked.connect(self.check_license_action)
-        self.license_status_label = QtWidgets.QLabel("")
-
-        self.load_config()
-        self.sync_config_to_ui()
-
-    def save_config(self):
-        config = {
-            "lmstudio_url": self.lmstudio_url_edit.text(),
-            "lmstudio_model": self.lmstudio_model_edit.text(),
-            "vosk_model_path": self.vosk_model_path_edit.text(),
-            "enable_wakeword": self.enable_wakeword_checkbox.isChecked(),
-            "wakeword": self.wakeword_edit.text(),
-            "block_wakeword_after_wake": self.block_wakeword_after_wake_checkbox.isChecked(),
-            "enable_autostop": self.enable_autostop_checkbox.isChecked(),
-            "autostop_time": self.autostop_time_edit.text()
-        }
-        with open("config.json", "w", encoding="utf-8") as f:
-            json.dump(config, f, ensure_ascii=False, indent=2)
-
-    def sync_config_to_ui(self):
-        config = SettingsDialog.read_config()
-        self.lmstudio_url_edit.setText(config.get("lmstudio_url", "http://localhost:1234/v1/chat/completions"))
-        self.lmstudio_model_edit.setText(config.get("lmstudio_model", "your-model-name"))
-        self.vosk_model_path_edit.setText(config.get("vosk_model_path", "E:/AITools/model/Vosk/vosk-model-cn-0.22"))
-        self.enable_wakeword_checkbox.setChecked(config.get("enable_wakeword", False))
-        self.wakeword_edit.setText(config.get("wakeword", "你好小明"))
-        self.block_wakeword_after_wake_checkbox.setChecked(config.get("block_wakeword_after_wake", True))
-        self.enable_autostop_checkbox.setChecked(config.get("enable_autostop", False))
-        self.autostop_time_edit.setText(str(config.get("autostop_time", 30)))
-        self.layout.addRow("LMStudio地址:", self.lmstudio_url_edit)
-        self.layout.addRow("LMStudio模型名:", self.lmstudio_model_edit)
-        self.layout.addRow("Vosk模型路径:", self.vosk_model_path_edit)
-        self.layout.addRow(self.enable_wakeword_checkbox)
-        self.layout.addRow("唤醒词:", self.wakeword_edit)
-        self.layout.addRow(self.block_wakeword_after_wake_checkbox)
-        self.layout.addRow(self.enable_autostop_checkbox)
-        self.layout.addRow("定时自动停止(秒):", self.autostop_time_edit)
-
-        # 加密相关控件布局
-        self.layout.addRow("本机机器码:", self.machine_id_edit)
-        self.layout.addRow("", self.btn_copy_machine_id)
-        self.layout.addRow("公钥路径:", self.pubkey_path_edit)
-        self.layout.addRow("许可文件路径:", self.license_path_edit)
-        self.layout.addRow("", self.btn_check_license)
-        self.layout.addRow("许可证状态:", self.license_status_label)
-
-        btn_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        btn_box.accepted.connect(self.accept)
-        btn_box.rejected.connect(self.reject)
-        self.layout.addWidget(btn_box)
-        self.setLayout(self.layout)
-    def copy_machine_id(self):
-        clipboard = QtWidgets.QApplication.clipboard()
-        clipboard.setText(self.machine_id_edit.text())
-        QtWidgets.QMessageBox.information(self, "复制成功", "机器码已复制到剪贴板！")
-
-    def check_license_action(self):
-        pubkey_path = self.pubkey_path_edit.text()
-        license_path = self.license_path_edit.text()
-        import importlib.util, os
-        加密_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './加密'))
-        license_check_path = os.path.join(加密_dir, 'license_check.py')
-        spec = importlib.util.spec_from_file_location('license_check', license_check_path)
-        license_check_mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(license_check_mod)
-        check_license = license_check_mod.check_license
-        result = check_license(license_path, pubkey_path)
-        self.license_status_label.setText(result.get('msg', '未知'))
-
-    def load_config(self):
-        config = SettingsDialog.read_config()
-        self.lmstudio_url_edit.setText(config.get("lmstudio_url", "http://localhost:1234/v1/chat/completions"))
-        self.lmstudio_model_edit.setText(config.get("lmstudio_model", "your-model-name"))
-        self.vosk_model_path_edit.setText(config.get("vosk_model_path", "E:/AITools/model/Vosk/vosk-model-cn-0.22"))
-        self.enable_wakeword_checkbox.setChecked(config.get("enable_wakeword", False))
-        self.wakeword_edit.setText(config.get("wakeword", "你好小明"))
-        self.block_wakeword_after_wake_checkbox.setChecked(config.get("block_wakeword_after_wake", True))
-        self.enable_autostop_checkbox.setChecked(config.get("enable_autostop", False))
-        self.autostop_time_edit.setText(str(config.get("autostop_time", 30)))
-
-    @staticmethod
-    def read_config():
-        try:
-            with open("config.json", "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return {}
 
 # MainWindow主界面类，包含所有主流程和UI逻辑
 class MainWindow(QtWidgets.QWidget):
@@ -250,10 +142,18 @@ class MainWindow(QtWidgets.QWidget):
         tts_text = answer
         try:
             parsed = json.loads(answer)
+            # 为JSON添加时间ID
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            enhanced_json = {
+                "id": current_time,
+                **parsed  # 将原始JSON内容合并
+            }
+            # 写入增强后的JSON
+            enhanced_json_str = json.dumps(enhanced_json, ensure_ascii=False, indent=2)
             with open("model_command.txt", "w", encoding="utf-8") as f:
-                f.write(answer)
+                f.write(enhanced_json_str)
             tts_text = "命令已收到"
-            log_with_time("[DEBUG] answer为JSON，已写入model_command.txt，仅播报命令已收到")
+            log_with_time(f"[DEBUG] answer为JSON，已添加时间ID({current_time})并写入model_command.txt，仅播报命令已收到")
         except Exception:
             pass  # 不是JSON，正常处理
         return tts_text
@@ -684,10 +584,18 @@ class MainWindow(QtWidgets.QWidget):
                                 tts_text = answer
                                 try:
                                     parsed = json.loads(answer)
+                                    # 为JSON添加时间ID
+                                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                    enhanced_json = {
+                                        "id": current_time,
+                                        **parsed  # 将原始JSON内容合并
+                                    }
+                                    # 写入增强后的JSON
+                                    enhanced_json_str = json.dumps(enhanced_json, ensure_ascii=False, indent=2)
                                     with open("model_command.txt", "w", encoding="utf-8") as f:
-                                        f.write(answer)
+                                        f.write(enhanced_json_str)
                                     tts_text = "命令已收到"
-                                    log_with_time("[DEBUG] process_next: answer为JSON，已写入model_command.txt，仅播报命令已收到")
+                                    log_with_time(f"[DEBUG] process_next: answer为JSON，已添加时间ID({current_time})并写入model_command.txt，仅播报命令已收到")
                                 except Exception:
                                     pass
                                 # 用Qt信号让TTS在主线程执行

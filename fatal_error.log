@@ -451,3 +451,21 @@ TypeError: receivers(self, signal: PYQT_SIGNAL): first argument of unbound metho
 [DEBUG] process_next: 开始TTS播报 (主线程: 29912, 当前线程: 4596)
 [DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
 [DEBUG] process_next: 开始TTS播报 (主线程: 18732, 当前线程: 26268)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 16464, 当前线程: 15900)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 6564, 当前线程: 32740)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 6564, 当前线程: 32740)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 6564, 当前线程: 32740)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 6564, 当前线程: 32740)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 6564, 当前线程: 32740)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"3"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 16780, 当前线程: 12896)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"8"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 16780, 当前线程: 12896)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。请提供更多具体信息以确定您的需求。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 16780, 当前线程: 12896)
