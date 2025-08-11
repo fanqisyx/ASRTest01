@@ -1,0 +1,28 @@
+{
+  "server_a": {
+    "ip": "127.0.0.1",
+    "port": "502"
+  },
+  "server_b": {
+    "ip": "127.0.0.1",
+    "port": "503"
+  },
+  "monitoring": {
+    "server_interval": "5",
+    "file_interval": "2",
+    "json_file_path": "F:/download-doc/锡职大/20250807/语音软件汇总 2025-08-06/2025-08-07/01.语音识别整合 v1.2/整合/model_command.txt",
+    "polish_file_path": "F:/download-doc/锡职大/20250807/语音软件汇总 2025-08-06/2025-08-07/01.语音识别整合 v1.2/整合/action_damo.txt"
+  },
+  "window": {
+    "geometry": "800x600+124+184"
+  },
+  "last_updated": "2025-08-07 19:19:10",
+  "lmstudio_url": "http://localhost:1234/v1/chat/completions",
+  "lmstudio_model": "llm/gguf/qwen3-0.6b-q8_0.gguf",
+  "vosk_model_path": "E:\\AITools\\model\\Vosk\\vosk-model-cn-0.22",
+  "enable_wakeword": true,
+  "wakeword": "小溪",
+  "block_wakeword_after_wake": true,
+  "enable_autostop": true,
+  "autostop_time": "30"
+}

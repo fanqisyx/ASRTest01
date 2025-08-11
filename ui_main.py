@@ -49,12 +49,15 @@ class LightIndicator(QtWidgets.QWidget):
 # MainWindow主界面类，包含所有主流程和UI逻辑
 class MainWindow(QtWidgets.QWidget):
     tts_signal = pyqtSignal(str)
+    status_signal = pyqtSignal(str)  # 新增：通用状态文本信号（主线程追加显示）
     def __init__(self):
         super().__init__()
         log_with_time(f"[TTS] MainWindow.__init__: self id={id(self)}")
         # 强制使用队列连接确保跨线程信号正常工作
         from PyQt5.QtCore import Qt
         connection_result = self.tts_signal.connect(self._tts_on_main_thread, Qt.QueuedConnection)
+        # 连接状态信号到append_text，确保线程安全UI更新
+        self.status_signal.connect(self.append_text, Qt.QueuedConnection)
         log_with_time(f"[TTS] MainWindow.__init__: signal connect result={connection_result} (使用QueuedConnection)")
         self.setWindowTitle("语音助手整合Demo")
         self.voice_queue = queue.Queue()
@@ -70,40 +73,112 @@ class MainWindow(QtWidgets.QWidget):
         self.autostop_timer = None
         self.init_ui()
         self.load_config()
+        # 初始化action_damo.txt文件
+        self.init_action_damo_file()
+        # 启动时清空model_command.txt
+        self.clear_model_command_file()
+        # 初始化串行TTS队列
+        self._init_tts_worker()
         # 测试信号槽连接
         self.test_signal_connection()
+        # 语音输入去重控制
+        self._last_voice_text = None
+        self._last_voice_time = 0
+        self._vosk_loaded = False  # 新增：Vosk模型是否已加载完成标志
+
+    def clear_model_command_file(self):
+        try:
+            with open("model_command.txt", "w", encoding="utf-8") as f:
+                f.write("")
+            log_with_time("[系统] model_command.txt已在启动时清空")
+        except Exception as e:
+            log_with_time(f"[系统] 清空model_command.txt失败: {e}")
+
+    def _compute_tts_delay(self, char_count):
+        """根据设置计算TTS结束后恢复收音的延迟"""
+        # tts_delay_mode: 'dynamic' or 'fixed'
+        if getattr(self, 'tts_delay_mode', 'fixed') == 'fixed':
+            try:
+                return max(0, float(getattr(self, 'tts_fixed_delay', 3)))
+            except Exception:
+                return 3.0
+        # 动态：字数/速度 + 0.5s缓冲
+        chars_per_second = 200 / 60  # 约3.33/秒
+        return char_count / chars_per_second + 0.5
 
     def _safe_speak(self, text):
-        """安全的TTS播报方法，用于唤醒回复等简短文本"""
+        """阻塞方式安全播报：使用pyttsx3全局TTS队列并等待完成，避免PowerShell策略/转义问题"""
         try:
-            log_with_time(f"[TTS] _safe_speak: 播报: {text}")
-            import subprocess
-            
-            # 转义文本
-            escaped_text = text.replace('"', '""')
-            
-            # 使用修复后的PowerShell命令
-            ps_cmd = f'''Add-Type -AssemblyName System.Speech; $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer; $synth.SelectVoiceByHints([System.Speech.Synthesis.VoiceGender]::NotSet, [System.Speech.Synthesis.VoiceAge]::NotSet, 0, [System.Globalization.CultureInfo]::CreateSpecificCulture("zh-CN")); $synth.Speak("{escaped_text}"); $synth.Dispose()'''
-            
-            result = subprocess.run(
-                ["powershell", "-Command", ps_cmd],
-                capture_output=True,
-                text=True,
-                timeout=10,
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
-            
-            if result.returncode == 0:
-                log_with_time(f"[TTS] _safe_speak: 播报完成: {text}")
+            from tts_module import speak_text_safe
+            done = threading.Event()
+            def _cb():
+                done.set()
+            speak_text_safe(text, callback=_cb)
+            # 等待播报完成（最长120秒，避免死等）
+            finished = done.wait(timeout=120)
+            if not finished:
+                log_with_time(f"[TTS] _safe_speak: 播报等待超时: {text[:40]}")
             else:
-                # 备选：使用系统提示音
-                import winsound
-                winsound.MessageBeep(winsound.MB_ICONINFORMATION)
-                log_with_time(f"[TTS] _safe_speak: 使用提示音替代: {text}")
-                
+                log_with_time(f"[TTS] _safe_speak: 播报完成: {text[:40] + ('...' if len(text)>40 else '')}")
         except Exception as e:
-            log_with_time(f"[TTS] _safe_speak: 播报异常: {e}")
-    
+            log_with_time(f"[TTS] _safe_speak: 异常: {e}")
+            try:
+                import winsound
+                winsound.MessageBeep()
+            except Exception:
+                pass
+
+    # ---- 串行TTS队列相关 ----
+    def _init_tts_worker(self):
+        import heapq
+        self._tts_pq_lock = threading.Lock()
+        self._tts_pq = []  # (priority, seq, text)
+        self._tts_seq = 0
+        self._tts_event = threading.Event()
+        self._tts_worker_thread = threading.Thread(target=self._tts_worker, daemon=True)
+        self._tts_worker_thread.start()
+        log_with_time("[TTS] 串行TTS工作线程已启动")
+
+    def _enqueue_tts(self, text, priority=False):
+        """加入TTS任务。priority=True用于JSON确认优先播报"""
+        import heapq
+        with self._tts_pq_lock:
+            self._tts_seq += 1
+            prio = 0 if priority else 1
+            heapq.heappush(self._tts_pq, (prio, self._tts_seq, text))
+            self._tts_event.set()
+        log_with_time(f"[TTS] 入队: prio={prio} text={(text[:40] + '...' if len(text)>40 else text)}")
+
+    def _tts_worker(self):
+        import heapq
+        while True:
+            self._tts_event.wait()
+            while True:
+                with self._tts_pq_lock:
+                    if not self._tts_pq:
+                        self._tts_event.clear()
+                        break
+                    prio, seq, text = heapq.heappop(self._tts_pq)
+                try:
+                    # 播放前暂停收音
+                    self.listen_pause.set()
+                    self.set_status_light(False)
+                    self._safe_speak(text)
+                    delay = self._compute_tts_delay(len(text))
+                    log_with_time(f"[TTS] 播放完成，延迟{delay:.2f}s后恢复收音")
+                    time.sleep(delay)
+                except Exception as e:
+                    log_with_time(f"[TTS] _tts_worker异常: {e}")
+                finally:
+                    self.listen_pause.clear()
+                    if self.listening:
+                        self.set_status_light(True)
+                    # 仅在完成一条TTS后（而不是全部清空后）重启倒计时
+                    try:
+                        self._start_autostop_timer()
+                    except Exception as e:
+                        log_with_time(f"[TTS] 重启倒计时异常: {e}")
+
     def _pause_listening(self):
         """暂停语音识别"""
         self.listen_discard_event.set()
@@ -148,12 +223,26 @@ class MainWindow(QtWidgets.QWidget):
                 "id": current_time,
                 **parsed  # 将原始JSON内容合并
             }
-            # 写入增强后的JSON
-            enhanced_json_str = json.dumps(enhanced_json, ensure_ascii=False, indent=2)
-            with open("model_command.txt", "w", encoding="utf-8") as f:
-                f.write(enhanced_json_str)
-            tts_text = "命令已收到"
-            log_with_time(f"[DEBUG] answer为JSON，已添加时间ID({current_time})并写入model_command.txt，仅播报命令已收到")
+            
+            # 检查是否包含"kaishidamo"键
+            if "kaishidamo" in parsed:
+                # 检查值是否为"1"
+                if parsed["kaishidamo"] == "1":
+                    # 写入action_damo_.txt文件
+                    enhanced_json_str = json.dumps(enhanced_json, ensure_ascii=False, indent=2)
+                    with open("action_damo.txt", "w", encoding="utf-8") as f:
+                        f.write(enhanced_json_str)
+                    tts_text = "开始打磨命令已收到"
+                    log_with_time(f"[DEBUG] 检测到开始打磨指令，已添加时间ID({current_time})并写入action_damo_.txt")
+                else:
+                    pass  # kaishidamo值不是"1"，不处理
+            else:
+                # 写入增强后的JSON到model_command.txt
+                enhanced_json_str = json.dumps(enhanced_json, ensure_ascii=False, indent=2)
+                with open("model_command.txt", "w", encoding="utf-8") as f:
+                    f.write(enhanced_json_str)
+                tts_text = "命令已收到"
+                log_with_time(f"[DEBUG] answer为JSON，已添加时间ID({current_time})并写入model_command.txt，仅播报命令已收到")
         except Exception:
             pass  # 不是JSON，正常处理
         return tts_text
@@ -196,11 +285,9 @@ class MainWindow(QtWidgets.QWidget):
             log_with_time("[TTS] _tts_on_main_thread: 调用speak_text_interruptable")
             speak_text_interruptable(text, self.tts_stop_event)
             log_with_time("[TTS] _tts_on_main_thread: speak_text_interruptable返回，准备估算延迟")
-            # 估算TTS朗读时长，rate=200字/分钟（pyttsx3默认），加0.3秒缓冲
+            # 估算TTS朗读时长
             char_count = len(text)
-            log_with_time(f"[TTS] _tts_on_main_thread: 字符数={char_count}")
-            chars_per_second = 200 / 60
-            estimated = char_count / chars_per_second + 0.3
+            estimated = self._compute_tts_delay(char_count)
             log_with_time(f"[TTS] _tts_on_main_thread: 朗读结束，延迟{estimated:.2f}秒后恢复收音")
             time.sleep(estimated)
             log_with_time("[TTS] _tts_on_main_thread: 延迟结束，准备恢复收音")
@@ -225,6 +312,17 @@ class MainWindow(QtWidgets.QWidget):
         self.text_display = QtWidgets.QTextEdit()
         self.text_display.setReadOnly(True)
         left_layout.addWidget(self.text_display)
+
+        # 手动输入测试区域
+        manual_layout = QtWidgets.QHBoxLayout()
+        self.manual_input = QtWidgets.QLineEdit()
+        self.manual_input.setPlaceholderText("手动输入测试内容，回车或点击发送")
+        self.manual_input.returnPressed.connect(self.send_manual_input)
+        self.manual_send_btn = QtWidgets.QPushButton("发送(测试)")
+        self.manual_send_btn.clicked.connect(self.send_manual_input)
+        manual_layout.addWidget(self.manual_input)
+        manual_layout.addWidget(self.manual_send_btn)
+        left_layout.addLayout(manual_layout)
 
         btn_layout = QtWidgets.QHBoxLayout()
         self.btn_start = QtWidgets.QPushButton("开始聆听")
@@ -294,6 +392,9 @@ class MainWindow(QtWidgets.QWidget):
         self.enable_autostop = config.get("enable_autostop", False)
         self.autostop_time = int(config.get("autostop_time", 30))
         self.block_wakeword_after_wake = config.get("block_wakeword_after_wake", True)
+        self.no_think = bool(config.get("no_think", False))  # 新增: No Think配置
+        self.tts_delay_mode = config.get("tts_delay_mode", "fixed")  # 'fixed' or 'dynamic'
+        self.tts_fixed_delay = float(config.get("tts_fixed_delay", 3))
         self.wake_state = 'idle'
 
     def open_settings(self):
@@ -308,6 +409,23 @@ class MainWindow(QtWidgets.QWidget):
     def append_text(self, msg):
         self.text_display.append(msg)
 
+    # 新增：手动输入发送逻辑
+    def send_manual_input(self):
+        text = self.manual_input.text().strip()
+        if not text:
+            return
+        if not self.listening:
+            # 未开始监听时提示
+            nowstr = datetime.datetime.now().strftime('%H:%M:%S')
+            self.append_text(f"[{nowstr}] [系统] 请先开始聆听后再进行手动测试。")
+            return
+        nowstr = datetime.datetime.now().strftime('%H:%M:%S')
+        # 追加到历史 & 队列，模拟识别结果
+        self.voice_history.append((nowstr, text))
+        self.update_queue_list()
+        self.voice_queue.put(text)
+        self.manual_input.clear()
+        self.process_next()
 
     def start_listen(self):
         import traceback
@@ -381,7 +499,6 @@ class MainWindow(QtWidgets.QWidget):
         # 重置状态
         self.listen_discard_event.clear()
         self.listen_pause.clear()
-        
         # 停止倒计时线程，清空label
         self.label_countdown.setText("")
         if hasattr(self, '_countdown_timer') and self._countdown_timer:
@@ -390,6 +507,32 @@ class MainWindow(QtWidgets.QWidget):
         msg = f"[{datetime.datetime.now().strftime('%H:%M:%S')}] [系统] 已停止聆听。"
         self.append_text(msg)
         log_with_time(msg)
+
+    def _on_vosk_loading(self):
+        """Vosk模型开始加载回调（仅第一次）"""
+        if self._vosk_loaded:
+            return
+        ts = datetime.datetime.now().strftime('%H:%M:%S')
+        self.status_signal.emit(f"[{ts}] [系统] 正在加载语音识别模型...")
+        log_with_time("[系统] 正在加载语音识别模型...")
+        try:
+            self.set_status_light(False)
+        except Exception:
+            pass
+
+    def _on_vosk_ready(self):
+        """Vosk模型加载完成回调（仅第一次）"""
+        if self._vosk_loaded:
+            return
+        self._vosk_loaded = True
+        ts = datetime.datetime.now().strftime('%H:%M:%S')
+        self.status_signal.emit(f"[{ts}] [系统] 语音识别模型已就绪")
+        log_with_time("[系统] 语音识别模型已就绪")
+        try:
+            if self.listening and not self.listen_pause.is_set():
+                self.set_status_light(True)
+        except Exception:
+            pass
 
     def listen_loop(self):
         import traceback
@@ -402,8 +545,22 @@ class MainWindow(QtWidgets.QWidget):
                     time.sleep(0.1)
                     continue
                 self.listen_stop_event.clear()
-                self.set_status_light(True)
-                text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+                self.set_status_light(True if self._vosk_loaded else False)
+                # 仅在首次加载时提供回调显示加载/完成状态
+                if not self._vosk_loaded:
+                    text = vosk_module.recognize_speech(
+                        self.vosk_model_path,
+                        stop_event=self.listen_stop_event,
+                        discard_event=self.listen_discard_event,
+                        on_model_loading=self._on_vosk_loading,
+                        on_model_ready=self._on_vosk_ready
+                    )
+                else:
+                    text = vosk_module.recognize_speech(
+                        self.vosk_model_path,
+                        stop_event=self.listen_stop_event,
+                        discard_event=self.listen_discard_event
+                    )
                 if not self.listening:
                     break
                 nowstr = datetime.datetime.now().strftime('%H:%M:%S')
@@ -413,6 +570,33 @@ class MainWindow(QtWidgets.QWidget):
                 if text:
                     self.voice_history.append((nowstr, text))
                     self.update_queue_list()
+                # 封装入队（含去重节流）
+                def try_enqueue(txt):
+                    if not txt:
+                        return
+                    import time as _t
+                    ts = _t.time()
+                    norm = txt.strip()
+                    # 重复抑制：完全相同且1.0秒内出现视为同一条，忽略
+                    if self._last_voice_text == norm and (ts - self._last_voice_time) < 1.0:
+                        log_with_time(f"[VOICE] 跳过短间隔重复: {norm}")
+                        return
+                    # 若队列中已经存在同文本（防止在当前处理尚未结束时再次多次识别同一句）
+                    try:
+                        existing = list(self.voice_queue.queue)
+                        if norm in existing:
+                            log_with_time(f"[VOICE] 队列已包含该文本，忽略: {norm}")
+                            return
+                    except Exception:
+                        pass
+                    # 合法入队
+                    self.voice_queue.put(norm)
+                    self._last_voice_text = norm
+                    self._last_voice_time = ts
+                    log_with_time(f"[VOICE] 入队文本: {norm}")
+                    # 仅在当前未processing时启动处理线程；若正在processing则循环会自动取新任务
+                    if not self.processing:
+                        self.process_next()
                 if self.enable_wakeword:
                     if self.wake_state == 'idle':
                         if text:
@@ -421,47 +605,37 @@ class MainWindow(QtWidgets.QWidget):
                                 self.wake_state = 'waked'
                                 self.append_text(f"[{nowstr}] [系统] 检测到唤醒词，已唤醒")
                                 log_with_time("[系统] 检测到唤醒词，已唤醒")
-                                self._start_autostop_timer()  # 唤醒后立即启动倒计时
+                                self._start_autostop_timer()
                                 self.listen_discard_event.set()
                                 self.set_status_light(False)
-                                # 使用安全的系统TTS播报唤醒回复
                                 self._safe_speak("你好！")
                                 self.listen_discard_event.clear()
                                 if self.listening:
                                     self.set_status_light(True)
                                 if not self.block_wakeword_after_wake:
-                                    if not self.processing and self.voice_queue.empty():
-                                        self.voice_queue.put(text)
-                                        self.process_next()
+                                    try_enqueue(text)
                     elif self.wake_state == 'waked':
                         if self.block_wakeword_after_wake:
                             if text and not self.listen_discard_event.is_set():
-                                # 无论processing状态如何都推送，保证多轮对话
-                                self.voice_queue.put(text)
-                                self.process_next()
+                                try_enqueue(text)
                         else:
                             if text:
                                 text_pinyin = self._normalize_pinyin(text)
                                 if wakeword_pinyin and wakeword_pinyin in text_pinyin:
                                     self.append_text(f"[{nowstr}] [系统] 检测到唤醒词，已唤醒")
-                                    log_with_time("[系统] 检测到唤醒词，已唤醒")
+                                    log_with_time("[系统] 再次检测到唤醒词")
                                     self.listen_discard_event.set()
                                     self.set_status_light(False)
-                                    # 使用安全的系统TTS播报唤醒回复
                                     self._safe_speak("你好！")
                                     self.listen_discard_event.clear()
                                     if self.listening:
                                         self.set_status_light(True)
                                 else:
                                     if text and not self.listen_discard_event.is_set():
-                                        if not self.processing and self.voice_queue.empty():
-                                            self.voice_queue.put(text)
-                                            self.process_next()
+                                        try_enqueue(text)
                 else:
                     if text and not self.listen_discard_event.is_set():
-                        if not self.processing and self.voice_queue.empty():
-                            self.voice_queue.put(text)
-                            self.process_next()
+                        try_enqueue(text)
                 time.sleep(0.1)
         except Exception as e:
             tb = traceback.format_exc()
@@ -521,189 +695,149 @@ class MainWindow(QtWidgets.QWidget):
             self.stop_listen()
 
     def process_next(self):
-        if self.processing:
-            log_with_time("[DEBUG] process_next: 已在processing中，直接返回")
-            return
+        # 原逻辑存在竞态：多个调用在自处理线程设置processing=True之前并发进入，导致多线程处理和潜在崩溃
+        with self.process_lock:
+            if getattr(self, 'processing', False):
+                log_with_time("[DEBUG] process_next: 已在processing中(加锁检查)，返回")
+                return
+            self.processing = True  # 先占位，防止并发
         def nowstr():
             return datetime.datetime.now().strftime("%H:%M:%S")
         def _process():
-            with self.process_lock:
-                self.processing = True
-                log_with_time("[DEBUG] process_next: 进入processing流程")
-                try:
-                    while self.listening or not self.voice_queue.empty():
-                        if not self.voice_queue.empty():
-                            text = self.voice_queue.get()
-                            log_with_time(f"[DEBUG] process_next: 取出队列文本: {text}")
-                            # 只收到1个字时，视为噪音，丢弃
-                            if text and len(text.strip()) == 1:
-                                log_with_time(f"[DEBUG] process_next: 1字噪音丢弃: {text}")
-                                continue
-                            self.update_queue_list()
-                            msg_user = f"[{nowstr()}] [你] {text}"
-                            self.append_text(msg_user)
-                            log_with_time(f"[你] {text}")
-                            msg_sys = f"[{nowstr()}] [系统] 正在加载模型与生成回复..."
-                            self.append_text(msg_sys)
-                            log_with_time("[系统] 正在加载模型与生成回复...")
-                            self.listen_pause.set()
-                            self.set_status_light(False)
-                            # 对话期间停止倒计时（cancel），TTS播报后再重启
-                            if hasattr(self, '_countdown_timer') and self._countdown_timer:
-                                log_with_time("[DEBUG] process_next: 取消倒计时计时器，防止TTS期间退出唤醒")
+            try:
+                log_with_time("[DEBUG] process_next: 进入processing主线程")
+                while self.listening or not self.voice_queue.empty():
+                    try:
+                        if self.voice_queue.empty():
+                            time.sleep(0.05)
+                            continue
+                        text = self.voice_queue.get()
+                        log_with_time(f"[DEBUG] process_next: 取出队列文本: {text}")
+                        if text and len(text.strip()) == 1:
+                            log_with_time(f"[DEBUG] process_next: 1字噪音丢弃: {text}")
+                            continue
+                        self.update_queue_list()
+                        msg_user = f"[{nowstr()}] [你] {text}"
+                        self.append_text(msg_user)
+                        log_with_time(f"[你] {text}")
+                        msg_sys = f"[{nowstr()}] [系统] 正在加载模型与生成回复..."
+                        self.append_text(msg_sys)
+                        log_with_time("[系统] 正在加载模型与生成回复...")
+                        self.listen_pause.set()
+                        self.set_status_light(False)
+                        if hasattr(self, '_countdown_timer') and self._countdown_timer:
+                            try:
                                 self._countdown_timer.cancel()
-                            if hasattr(self, 'autostop_timer') and self.autostop_timer:
-                                log_with_time("[DEBUG] process_next: 取消主自动停止计时器，防止TTS期间退出唤醒")
+                            except Exception:
+                                pass
+                        if hasattr(self, 'autostop_timer') and self.autostop_timer:
+                            try:
                                 self.autostop_timer.cancel()
+                            except Exception:
+                                pass
+                        try:
+                            send_text = text + " /no_think" if getattr(self, 'no_think', False) else text
+                            thinking, answer = query_lmstudio(send_text, self.lmstudio_url, self.lmstudio_model)
+                        except Exception as e:
+                            log_with_time(f"[ERROR] query_lmstudio异常: {e}")
+                            self.append_text(f"[{nowstr()}] [系统] AI回复异常: {e}")
+                            answer = "抱歉，AI回复失败。"
+                            thinking = None
+                        if thinking:
+                            # 只显示，不进TTS
+                            msg_think = f"[{nowstr()}] [思考] {thinking}"
+                            self.append_text(msg_think)
+                            log_with_time(f"[思考] {thinking}")
+                        msg_ai = f"[{nowstr()}] [AI] {answer}"
+                        self.append_text(msg_ai)
+                        log_with_time(f"[AI] {answer}")
+                        self.listen_discard_event.set()
+                        self.set_status_light(False)
+                        import json, traceback
+                        try:
+                            log_with_time(f"[DEBUG] process_next: TTS准备阶段 answer长度={len(answer)}")
+                            tts_text = answer
+                            is_json_command = False
                             try:
-                                thinking, answer = query_lmstudio(text, self.lmstudio_url, self.lmstudio_model)
-                            except Exception as e:
-                                log_with_time(f"[ERROR] query_lmstudio异常: {e}")
-                                self.append_text(f"[{nowstr()}] [系统] AI回复异常: {e}")
-                                answer = "抱歉，AI回复失败。"
-                                thinking = None
-                            if thinking:
-                                msg_think = f"[{nowstr()}] [思考] {thinking}"
-                                self.append_text(msg_think)
-                                log_with_time(f"[思考] {thinking}")
-                            msg_ai = f"[{nowstr()}] [AI] {answer}"
-                            self.append_text(msg_ai)
-                            log_with_time(f"[AI] {answer}")
-                            self.listen_discard_event.set()
-                            self.set_status_light(False)
-                            import threading, traceback, sys
-                            import json
-                            try:
-                                log_with_time(f"[DEBUG] process_next: TTS播报前参数: answer={answer}, tts_stop_event={self.tts_stop_event.is_set()}")
-                                log_with_time(f"[DEBUG] process_next: 开始TTS播报 (主线程: {threading.main_thread().ident}, 当前线程: {threading.current_thread().ident})")
-                                import os
-                                with open("fatal_error.log", "a", encoding="utf-8") as f:
-                                    f.write(f"[DEBUG] process_next: TTS播报前参数: answer={answer}, tts_stop_event={self.tts_stop_event.is_set()}\n")
-                                    f.write(f"[DEBUG] process_next: 开始TTS播报 (主线程: {threading.main_thread().ident}, 当前线程: {threading.current_thread().ident})\n")
-                                # 新增：如为JSON，写入txt并只播报“命令已收到”
-                                tts_text = answer
-                                try:
-                                    parsed = json.loads(answer)
-                                    # 为JSON添加时间ID
-                                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                                    enhanced_json = {
-                                        "id": current_time,
-                                        **parsed  # 将原始JSON内容合并
-                                    }
-                                    # 写入增强后的JSON
-                                    enhanced_json_str = json.dumps(enhanced_json, ensure_ascii=False, indent=2)
+                                parsed = json.loads(answer)
+                                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                enhanced_json = {"id": current_time, **parsed}
+                                if "kaishidamo" in parsed and str(parsed["kaishidamo"]) == "1":
+                                    with open("action_damo.txt", "w", encoding="utf-8") as f:
+                                        f.write(json.dumps(enhanced_json, ensure_ascii=False, indent=2))
+                                    tts_text = "开始打磨命令已收到"
+                                    is_json_command = True
+                                    log_with_time("[DEBUG] JSON包含kaishidamo=1 -> action_damo.txt 写入并播报: 开始打磨命令已收到")
+                                elif "source" in parsed:
                                     with open("model_command.txt", "w", encoding="utf-8") as f:
-                                        f.write(enhanced_json_str)
+                                        f.write(json.dumps(enhanced_json, ensure_ascii=False, indent=2))
+                                    tts_text = "产品入库命令已收到"
+                                    is_json_command = True
+                                    log_with_time("[DEBUG] JSON包含source -> model_command.txt 写入并播报: 产品入库命令已收到")
+                                else:
+                                    with open("model_command.txt", "w", encoding="utf-8") as f:
+                                        f.write(json.dumps(enhanced_json, ensure_ascii=False, indent=2))
                                     tts_text = "命令已收到"
-                                    log_with_time(f"[DEBUG] process_next: answer为JSON，已添加时间ID({current_time})并写入model_command.txt，仅播报命令已收到")
-                                except Exception:
-                                    pass
-                                # 用Qt信号让TTS在主线程执行
-                                log_with_time(f"[DEBUG] process_next: emit前 self id={id(self)}")
-                                log_with_time(f"[DEBUG] process_next: signal类型={type(self.tts_signal)}")
-                                log_with_time(f"[DEBUG] process_next: 当前线程是否为主线程={threading.current_thread() == threading.main_thread()}")
-                                
-                                # 放弃Qt信号机制，直接在工作线程中调用TTS（使用线程安全方式）
-                                log_with_time(f"[DEBUG] process_next: Qt信号失效，改用直接调用方式")
-                                log_with_time(f"[DEBUG] process_next: 直接调用TTS函数")
-                                
-                                # 直接调用TTS函数（使用系统TTS，更稳定）
-                                import threading
-                                def safe_tts_call():
-                                    try:
-                                        log_with_time(f"[TTS] safe_tts_call: 开始TTS播报, text={tts_text}")
-                                        log_with_time("[TTS] safe_tts_call: 设置listen_pause，暂停收音")
-                                        self.listen_pause.set()
-                                        log_with_time("[TTS] safe_tts_call: 使用系统TTS播报")
-                                        
-                                        # 使用Windows系统SAPI语音引擎，避免pyttsx3崩溃问题
-                                        import time
-                                        import subprocess
-                                        try:
-                                            # 方法1：使用PowerShell的SAPI语音合成
-                                            log_with_time("[TTS] safe_tts_call: 使用PowerShell SAPI TTS")
-                                            # 转义文本中的特殊字符
-                                            escaped_text = tts_text.replace('"', '""').replace("'", "''")
-                                            ps_cmd = f'''Add-Type -AssemblyName System.Speech; $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer; $synth.SelectVoiceByHints([System.Speech.Synthesis.VoiceGender]::NotSet, [System.Speech.Synthesis.VoiceAge]::NotSet, 0, [System.Globalization.CultureInfo]::CreateSpecificCulture("zh-CN")); $synth.Speak("{escaped_text}"); $synth.Dispose()'''
-                                            
-                                            log_with_time(f"[TTS] safe_tts_call: 执行PowerShell命令播报: {tts_text}")
-                                            result = subprocess.run(
-                                                ["powershell", "-Command", ps_cmd],
-                                                capture_output=True,
-                                                text=True,
-                                                timeout=30,  # 30秒超时
-                                                creationflags=subprocess.CREATE_NO_WINDOW  # 不显示PowerShell窗口
-                                            )
-                                            
-                                            if result.returncode == 0:
-                                                log_with_time("[TTS] safe_tts_call: PowerShell TTS播放完成")
-                                            else:
-                                                raise Exception(f"PowerShell TTS失败: {result.stderr}")
-                                                
-                                        except Exception as tts_e:
-                                            log_with_time(f"[TTS] safe_tts_call: PowerShell TTS异常: {tts_e}")
-                                            # 方法2：fallback到简单的系统提示音
-                                            try:
-                                                log_with_time("[TTS] safe_tts_call: 使用系统提示音作为备选")
-                                                import winsound
-                                                # 播放系统提示音表示有消息
-                                                winsound.MessageBeep(winsound.MB_ICONINFORMATION)
-                                                log_with_time(f"[TTS] safe_tts_call: 系统提示音播放完成，内容: {tts_text}")
-                                            except Exception as beep_e:
-                                                log_with_time(f"[TTS] safe_tts_call: 系统提示音也失败: {beep_e}")
-                                        
-                                        log_with_time("[TTS] safe_tts_call: TTS处理完成，准备估算延迟")
-                                        # 估算TTS朗读时长，rate=200字/分钟（中文语音），加0.5秒缓冲
-                                        char_count = len(tts_text)
-                                        log_with_time(f"[TTS] safe_tts_call: 字符数={char_count}")
-                                        chars_per_second = 200 / 60  # 每秒约3.33个字符
-                                        estimated = char_count / chars_per_second + 0.5
-                                        log_with_time(f"[TTS] safe_tts_call: 延迟{estimated:.2f}秒后恢复收音")
-                                        time.sleep(estimated)
-                                        log_with_time("[TTS] safe_tts_call: 延迟结束，准备恢复收音")
-                                        self.listen_pause.clear()
-                                        log_with_time("[TTS] safe_tts_call: 已恢复收音")
-                                        # 确保状态指示灯正确更新
-                                        if self.listening:
-                                            log_with_time("[TTS] safe_tts_call: 尝试更新状态指示灯")
-                                    except Exception as e:
-                                        import traceback
-                                        tb = traceback.format_exc()
-                                        log_with_time(f"[TTS] safe_tts_call: 异常: {e}\n{tb}")
-                                        # 异常时也要恢复收音
-                                        self.listen_pause.clear()
-                                
-                                # 在当前线程中直接调用（避免创建新线程）
-                                safe_tts_call()
-                                log_with_time("[DEBUG] process_next: TTS直接调用完成")
-                            except Exception as e:
-                                tb = traceback.format_exc()
-                                log_with_time(f"[ERROR] TTS播报异常: {e}\n{tb}")
-                                with open("fatal_error.log", "a", encoding="utf-8") as f:
-                                    f.write(f"[ERROR] TTS播报异常: {e}\n{tb}\n")
-                                self.append_text(f"[{nowstr()}] [系统] TTS播报异常: {e}")
+                                    is_json_command = True
+                                    log_with_time("[DEBUG] JSON无kaishidamo/source -> 使用通用播报: 命令已收到")
+                            except Exception:
+                                pass
+                            self._enqueue_tts(tts_text, priority=is_json_command)
+                            log_with_time(f"[DEBUG] process_next: 已入队TTS priority={is_json_command}")
+                        except Exception as e:
+                            log_with_time(f"[ERROR] TTS阶段异常: {e}\n{traceback.format_exc()}")
+                            self.append_text(f"[{nowstr()}] [系统] TTS阶段异常: {e}")
+                        finally:
                             self.listen_discard_event.clear()
-                            # TTS已由safe_tts_call完全处理，包括收音恢复
-                            log_with_time("[DEBUG] process_next: TTS处理完成，状态已由TTS函数管理")
-                            # TTS播报后重启倒计时
-                            try:
-                                log_with_time("[DEBUG] process_next: TTS播报后重启倒计时")
-                                self._start_autostop_timer()
-                            except Exception as e:
-                                log_with_time(f"[ERROR] 倒计时重启异常: {e}")
-                        else:
-                            time.sleep(0.1)
-                except Exception as e:
-                    log_with_time(f"[ERROR] process_next主循环异常: {e}")
-                finally:
+                            log_with_time("[DEBUG] process_next: 本轮处理结束")
+                    except Exception as loop_e:
+                        import traceback
+                        log_with_time(f"[ERROR] process_next内部循环异常: {loop_e}\n{traceback.format_exc()}")
+                log_with_time("[DEBUG] process_next: 处理循环退出 (listening=%s queue_empty=%s)" % (self.listening, self.voice_queue.empty()))
+            except Exception as e:
+                import traceback
+                log_with_time(f"[ERROR] process_next主异常: {e}\n{traceback.format_exc()}")
+            finally:
+                with self.process_lock:
                     self.processing = False
-                    log_with_time("[DEBUG] process_next: 退出processing流程")
+                log_with_time("[DEBUG] process_next: processing标志已清除")
         threading.Thread(target=_process, daemon=True).start()
 
     def update_queue_list(self):
         self.list_queue.clear()
         for t, text in self.voice_history:
             self.list_queue.addItem(f"[{t}] {text}")
+    
+    def init_action_damo_file(self):
+        """初始化action_damo.txt文件"""
+        action_file_path = "action_damo.txt"
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        try:
+            if not os.path.exists(action_file_path):
+                # 文件不存在，创建新文件
+                initial_data = {
+                    "kaishidamo": "0",
+                    "id": current_time
+                }
+                with open(action_file_path, "w", encoding="utf-8") as f:
+                    json.dump(initial_data, f, ensure_ascii=False, indent=2)
+                log_with_time(f"创建action_damo.txt文件: {initial_data}")
+            else:
+                # 文件存在，读取并重置kaishidamo为0
+                with open(action_file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                
+                # 重置kaishidamo字段为0
+                data["kaishidamo"] = "0"
+                data["id"] = current_time  # 更新时间戳
+                
+                with open(action_file_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                log_with_time(f"重置action_damo.txt文件kaishidamo为0: {data}")
+                
+        except Exception as e:
+            log_with_time(f"初始化action_damo.txt文件失败: {str(e)}")
 
 # SettingsDialog保留为设置对话框
 class SettingsDialog(QtWidgets.QDialog):
@@ -721,10 +855,18 @@ class SettingsDialog(QtWidgets.QDialog):
         self.enable_autostop_checkbox = QtWidgets.QCheckBox("启用定时自动停止")
         self.autostop_time_edit = QtWidgets.QLineEdit()
         self.autostop_time_edit.setPlaceholderText("秒数，如30")
+        # 新增: No Think 复选框
+        self.no_think_checkbox = QtWidgets.QCheckBox("No Think（向模型追加 /no_think）")
+        # 新增：TTS延迟模式 + 固定延迟秒数
+        self.tts_delay_mode_combo = QtWidgets.QComboBox()
+        self.tts_delay_mode_combo.addItems(["动态计算", "固定延迟(秒)"])
+        self.tts_fixed_delay_edit = QtWidgets.QLineEdit()
+        self.tts_fixed_delay_edit.setPlaceholderText("固定延迟秒，默认3")
         self.load_config()
         self.sync_config_to_ui()
 
     def save_config(self):
+        mode = 'dynamic' if self.tts_delay_mode_combo.currentIndex() == 0 else 'fixed'
         config = {
             "lmstudio_url": self.lmstudio_url_edit.text(),
             "lmstudio_model": self.lmstudio_model_edit.text(),
@@ -733,7 +875,10 @@ class SettingsDialog(QtWidgets.QDialog):
             "wakeword": self.wakeword_edit.text(),
             "block_wakeword_after_wake": self.block_wakeword_after_wake_checkbox.isChecked(),
             "enable_autostop": self.enable_autostop_checkbox.isChecked(),
-            "autostop_time": self.autostop_time_edit.text()
+            "autostop_time": self.autostop_time_edit.text(),
+            "no_think": self.no_think_checkbox.isChecked(),
+            "tts_delay_mode": mode,
+            "tts_fixed_delay": self.tts_fixed_delay_edit.text() or '3'
         }
         with open("config.json", "w", encoding="utf-8") as f:
             json.dump(config, f, ensure_ascii=False, indent=2)
@@ -748,6 +893,10 @@ class SettingsDialog(QtWidgets.QDialog):
         self.block_wakeword_after_wake_checkbox.setChecked(config.get("block_wakeword_after_wake", True))
         self.enable_autostop_checkbox.setChecked(config.get("enable_autostop", False))
         self.autostop_time_edit.setText(str(config.get("autostop_time", 30)))
+        self.no_think_checkbox.setChecked(config.get("no_think", False))
+        mode = config.get("tts_delay_mode", "fixed")
+        self.tts_delay_mode_combo.setCurrentIndex(0 if mode == 'dynamic' else 1)
+        self.tts_fixed_delay_edit.setText(str(config.get("tts_fixed_delay", 3)))
         self.layout.addRow("LMStudio地址:", self.lmstudio_url_edit)
         self.layout.addRow("LMStudio模型名:", self.lmstudio_model_edit)
         self.layout.addRow("Vosk模型路径:", self.vosk_model_path_edit)
@@ -756,6 +905,9 @@ class SettingsDialog(QtWidgets.QDialog):
         self.layout.addRow(self.block_wakeword_after_wake_checkbox)
         self.layout.addRow(self.enable_autostop_checkbox)
         self.layout.addRow("定时自动停止(秒):", self.autostop_time_edit)
+        self.layout.addRow(self.no_think_checkbox)
+        self.layout.addRow("TTS延迟模式:", self.tts_delay_mode_combo)
+        self.layout.addRow("固定延迟(秒):", self.tts_fixed_delay_edit)
         btn_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         btn_box.accepted.connect(self.accept)
         btn_box.rejected.connect(self.reject)
@@ -772,6 +924,8 @@ class SettingsDialog(QtWidgets.QDialog):
         self.block_wakeword_after_wake_checkbox.setChecked(config.get("block_wakeword_after_wake", True))
         self.enable_autostop_checkbox.setChecked(config.get("enable_autostop", False))
         self.autostop_time_edit.setText(str(config.get("autostop_time", 30)))
+        self.no_think_checkbox.setChecked(config.get("no_think", False))
+        # 延迟模式在sync中处理
 
     @staticmethod
     def read_config():

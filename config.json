@@ -6,5 +6,8 @@
   "wakeword": "小溪",
   "block_wakeword_after_wake": true,
   "enable_autostop": true,
-  "autostop_time": "30"
+  "autostop_time": "30",
+  "no_think": false,
+  "tts_delay_mode": "fixed",
+  "tts_fixed_delay": "1"
 }

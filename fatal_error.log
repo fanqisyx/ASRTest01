@@ -469,3 +469,487 @@ TypeError: receivers(self, signal: PYQT_SIGNAL): first argument of unbound metho
 [DEBUG] process_next: 开始TTS播报 (主线程: 16780, 当前线程: 12896)
 [DEBUG] process_next: TTS播报前参数: answer=意图不明确。请提供更多具体信息以确定您的需求。, tts_stop_event=False
 [DEBUG] process_next: 开始TTS播报 (主线程: 16780, 当前线程: 12896)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"3"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28956, 当前线程: 33468)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"2","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28956, 当前线程: 33468)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28956, 当前线程: 33468)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28956, 当前线程: 33468)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"3"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26588, 当前线程: 36260)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 26588, 当前线程: 36260)
+[FATAL] listen_loop异常: Failed to create a model
+Traceback (most recent call last):
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\ui_main.py", line 406, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 41, in recognize_speech
+    model = get_vosk_model(model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 23, in get_vosk_model
+    model = Model(model_path)
+            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CCDQ\AppData\Local\Programs\Python\Python311\Lib\site-packages\vosk\__init__.py", line 57, in __init__
+    raise Exception("Failed to create a model")
+Exception: Failed to create a model
+
+[FATAL] listen_loop异常: Failed to create a model
+Traceback (most recent call last):
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\ui_main.py", line 406, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 41, in recognize_speech
+    model = get_vosk_model(model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 23, in get_vosk_model
+    model = Model(model_path)
+            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CCDQ\AppData\Local\Programs\Python\Python311\Lib\site-packages\vosk\__init__.py", line 57, in __init__
+    raise Exception("Failed to create a model")
+Exception: Failed to create a model
+
+[FATAL] listen_loop异常: Failed to create a model
+Traceback (most recent call last):
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\ui_main.py", line 406, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 41, in recognize_speech
+    model = get_vosk_model(model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 23, in get_vosk_model
+    model = Model(model_path)
+            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CCDQ\AppData\Local\Programs\Python\Python311\Lib\site-packages\vosk\__init__.py", line 57, in __init__
+    raise Exception("Failed to create a model")
+Exception: Failed to create a model
+
+[FATAL] listen_loop异常: Failed to create a model
+Traceback (most recent call last):
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\ui_main.py", line 406, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 41, in recognize_speech
+    model = get_vosk_model(model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 23, in get_vosk_model
+    model = Model(model_path)
+            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CCDQ\AppData\Local\Programs\Python\Python311\Lib\site-packages\vosk\__init__.py", line 57, in __init__
+    raise Exception("Failed to create a model")
+Exception: Failed to create a model
+
+[FATAL] listen_loop异常: Failed to create a model
+Traceback (most recent call last):
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\ui_main.py", line 406, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 41, in recognize_speech
+    model = get_vosk_model(model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 23, in get_vosk_model
+    model = Model(model_path)
+            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CCDQ\AppData\Local\Programs\Python\Python311\Lib\site-packages\vosk\__init__.py", line 57, in __init__
+    raise Exception("Failed to create a model")
+Exception: Failed to create a model
+
+[FATAL] listen_loop异常: Failed to create a model
+Traceback (most recent call last):
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\ui_main.py", line 406, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 41, in recognize_speech
+    model = get_vosk_model(model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 23, in get_vosk_model
+    model = Model(model_path)
+            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CCDQ\AppData\Local\Programs\Python\Python311\Lib\site-packages\vosk\__init__.py", line 57, in __init__
+    raise Exception("Failed to create a model")
+Exception: Failed to create a model
+
+[FATAL] listen_loop异常: Failed to create a model
+Traceback (most recent call last):
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\ui_main.py", line 406, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 41, in recognize_speech
+    model = get_vosk_model(model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\download-doc\锡职大\20250807\语音软件汇总 2025-08-06\2025-08-07\01.语音识别整合 v1.2\整合\vosk_module.py", line 23, in get_vosk_model
+    model = Model(model_path)
+            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CCDQ\AppData\Local\Programs\Python\Python311\Lib\site-packages\vosk\__init__.py", line 57, in __init__
+    raise Exception("Failed to create a model")
+Exception: Failed to create a model
+
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户让我把产品从1到3。首先，我需要理解这个请求的具体含义。可能是指产品生命周期中的某个阶段？比如从开发到测试再到上线？或者用户想表达某种流程上的转变？
+
+接下来，我要考虑用户的真实需求是什么。他们可能是在进行项目管理，或者在处理产品迭代的流程。也有可能用户是技术团队，想要了解如何将产品从初始版本逐步升级到更成熟的状态。
+
+然后，我需要确定用户的具体背景和使用场景。如果用户是项目经理，可能需要一个清晰的步骤指南；如果是开发人员，可能需要技术细节的支持。另外，还要考虑是否有隐藏的需求，比如是否需要资源调整、时间规划或者风险管理。
+
+同时，要注意用户的语言习惯，他们可能希望得到结构化的建议，而不是太笼统的回答。因此，在回答时应该分点列出关键步骤，并提供必要的解释，确保用户能够清晰理解每个阶段的作用和目标。
+
+最后，要检查是否有遗漏的信息或潜在的问题，比如是否需要考虑不同项目的特殊性，或者是否存在其他相关需求未被提及的情况。确保回答全面且实用。
+
+
+将产品从1到3可以理解为产品生命周期中的阶段性转变，通常涉及以下几个关键步骤：
+
+### 1. **阶段划分**
+   - **1（初始版本）**：产品开发、原型设计和核心功能实现。
+   - **2（测试与优化）**：用户反馈收集、功能迭代、性能优化和稳定性验证。
+   - **3（上线与推广）**：正式发布、市场推广、用户增长及持续维护。
+
+### 2. **关键行动**
+   - **1阶段**：完成核心功能开发，确保技术可行性与市场需求匹配。
+   - **2阶段**：通过用户测试收集数据，优化用户体验并解决潜在问题。
+   - **3阶段**：正式上线，进行市场推广，并建立持续迭代机制。
+
+### 3. **注意事项**
+   - 明确目标用户和业务需求，避免偏离核心价值。
+   - 注重资源分配（人力、预算、时间）的合理性。
+   - 风险管理：提前规划可能的问题并制定应对方案。
+
+如果需要更具体的指导（如技术实现细节或流程优化），可以进一步说明背景。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28632, 当前线程: 9380)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户让我把产品从1到3。首先，我需要理解这个请求的具体含义。可能是指产品生命周期中的某个阶段？比如从开发到测试再到上线？或者用户想表达某种流程上的转变？
+
+接下来，我要考虑用户的实际需求。他们可能是在指导如何管理产品或项目，或者在进行某种操作。也有可能用户遇到了问题，需要将某个步骤移动到另一个位置。例如，在项目管理中，产品从1到3可能意味着完成某项任务后进入下一个阶段。
+
+然后，我需要确定用户的身份和背景。如果是企业内部的流程优化，可能需要提供具体的步骤或建议；如果是个人项目，可能更关注操作细节。另外，用户可能没有明确说明当前处于哪个阶段，所以需要进一步询问以确保准确理解需求。
+
+同时，要注意用户的潜在需求。他们可能希望得到清晰的指导，或者需要帮助调整流程以提高效率。因此，在回答时应提供具体的步骤和建议，并鼓励用户提供更多上下文以便更精准的帮助。
+
+
+将产品从1到3可以理解为在产品生命周期中的不同阶段或任务推进。以下是常见的几种可能性：
+
+1. **产品开发阶段**：  
+   - 从1（需求收集）到3（原型设计），逐步完成核心功能。
+
+2. **测试阶段**：  
+   - 从1（初步测试）到3（全量验证），确保产品质量。
+
+3. **上线与部署**：  
+   - 从1（开发上线）到3（正式发布），完成最终交付。
+
+如果需要更具体的指导，请提供更多上下文，例如是企业流程、项目管理还是个人操作。, tts_stop_event=True
+[DEBUG] process_next: 开始TTS播报 (主线程: 28632, 当前线程: 9380)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户让我把产品从1到3。首先，我需要理解这个请求的具体含义。可能是指产品生命周期中的某个阶段？比如从开发到测试再到上线？或者用户想表达某种流程上的转变？
+
+接下来，我要考虑用户的实际需求。他们可能是在管理项目或产品生命周期，想要明确每个阶段的步骤。也有可能用户遇到了问题，需要指导如何将产品推进到下一个阶段。
+
+然后，我需要确定用户的身份和背景。可能是产品经理、项目经理，或者是团队成员在处理产品开发流程。不同的角色会有不同的需求，比如项目经理可能更关注时间线和资源分配，而产品经理可能关注目标和用户反馈。
+
+还要考虑用户的语言水平。如果用户是中文，可能需要使用中文来解释，但如果是英文，可能需要用英文术语。不过根据问题描述，用户用了中文，所以应该以中文回应。
+
+另外，用户可能没有明确说明他们具体指的是哪个阶段，比如开发、测试、上线还是其他环节。因此，在回答时需要提供足够的信息，帮助用户理解并按照步骤操作。
+
+最后，确保回复清晰、结构合理，并且具有指导性，让用户能够顺利将产品推进到下一个阶段。
+
+
+将产品从1到3通常是指产品生命周期中的不同阶段，具体含义可能因上下文而异。以下是常见的几种情况：
+
+1. **产品开发阶段**：  
+   - 从1（需求收集）到3（完成开发与测试）。  
+   - 示例流程：需求分析 → 设计 → 开发 → 测试 → 上线。
+
+2. **项目管理阶段**：  
+   - 从1（启动）到3（上线）。  
+   - 可能涉及资源分配、时间规划和风险管理。
+
+3. **用户反馈阶段**：  
+   - 从1（收集反馈）到3（优化产品）。  
+
+建议根据具体业务场景明确目标，例如：  
+- 若是开发流程，需按需求→设计→测试→上线分阶段推进。  
+- 若是项目管理，可关注时间线和资源分配。  
+
+请提供更多背景信息，以便更精准地帮助您！, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 6656, 当前线程: 27728)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说要将产品从1拿去到3。首先，我需要确认用户的指令是否符合给定的规则。根据规则，人的命令示例是“关节”从“Y工位”拿到仓库“A”库位，其中源头和目的地分别是Y工位和A库位。这里的源位置是Y工位，目标位置是A库位。
+
+用户现在的情况是将产品从1拿去到3。这里需要注意的是，规则中提到的源头包括1至4，而目的地包括1至9。所以用户的意图应该是将产品从源位置（1）运送到目标位置（3）。但用户没有明确说明是否需要考虑其他因素，比如是否有多个路径或者是否存在其他限制条件。
+
+根据规则中的示例，如果用户给出的是正确的源和目标，应该反馈对应的JSON。这里用户提供的信息是“从1拿到3”，所以source应该是1，target是3。因此，正确的回应应该是{"source":"1","target":"3"}。
+
+
+{"source":"1","target":"3"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 19564, 当前线程: 6524)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。这里的关键是确认用户的意图是否符合规则中的示例。用户直接说“开始打磨”，这对应到规则中的命令示例，所以应该正确反馈。不需要额外的信息或解释，只需按照指示生成JSON。
+
+
+{"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 19564, 当前线程: 6524)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。这里的关键是确认用户的意图是否符合规则中的示例。用户直接说“开始打磨”，这对应规则中的命令示例，因此应该正确反馈。不需要额外的信息或解释，只需按照指示生成JSON。
+
+
+{"kaishidamo": "1"}, tts_stop_event=True
+[DEBUG] process_next: 开始TTS播报 (主线程: 19564, 当前线程: 6524)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。这里的关键是确认用户的意图是否符合规则中的示例。用户直接说“开始打磨”，这对应规则中的命令示例，因此应该正确反馈。不需要额外的信息或解释，只需按照指示生成JSON。
+
+
+{"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28732, 当前线程: 28796)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。这里的关键是确认用户的意图是否符合规则中的示例。用户直接说“开始打磨”，这对应到规则中的命令示例，所以应该正确反馈。不需要额外的信息或解释，只需按照指示生成JSON。
+
+
+{"kaishidamo": "1"}, tts_stop_event=True
+[DEBUG] process_next: 开始TTS播报 (主线程: 28732, 当前线程: 28796)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到这个命令时，需要反馈{"kaishidamo":"1"}。首先确认用户的意图是否符合要求。这里的“开始打磨”确实对应规则中的“kaishidamo": "1"，所以直接生成对应的JSON即可。不需要额外的信息或解释，因为用户明确指定了动作。
+
+
+{"kaishidamo":"1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。这里的关键是确认用户的意图是否符合规则中的示例。用户直接说“开始打磨”，这对应规则中的命令示例，因此应该正确反馈。不需要额外的信息或解释，只需按照指示生成JSON。
+
+
+{"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“将产品1拿到2”。首先，我需要确认用户的意图。根据规则，这里的命令示例是“关节”从“Y工位”拿到仓库“A库位”，所以这里的产品应该是从Y工位拿到A库位。但用户现在说的是“将产品1拿到2”，可能是指产品1被移动到目的地2的位置。不过需要检查是否有其他意图的可能。
+
+根据规则，源头是Y工位，目标是A库位，而用户这次提到的是产品1和目的地2。这里可能存在混淆，因为原来的例子中是拿产品从Y到A，但用户现在可能是在说产品1被移动到目的地2的位置。不过需要确认是否符合规则中的源、目标定义。
+
+另外，用户的另一个命令示例是“开始打磨”，对应反馈{"kaishidamo":"1"}。当前用户没有提到任何动作或信号，只是陈述了拿产品的情况。因此，可能意图不明确，因为用户并没有提供具体的指令或信号来触发后续的动作，比如是否需要反馈其他内容或者确认操作。
+
+所以正确的回应应该是“意图不明确”，因为用户的命令示例中没有包含相关的信息，而当前的描述只是陈述动作，但缺少必要的信号或反馈。
+
+
+意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说要把产品从1拿去到2。首先，我需要确认用户的指令是否符合给定的规则。根据规则，命令示例中的源头和目的地是固定的，比如“Y工位”到“A库位”，而这里的源是1，目标是5。但用户现在说的是将产品从1拿到2，这可能意味着源是1，目标是2？不过原规则中提到的来源包括“1工位”、“2工位”等，目的地有“1”至“9”的库位。所以用户的意图应该是将产品从1（源）送到2（目标）。这时候需要检查是否符合规则中的示例，如果用户输入的是正确的源和目标，那么反馈对应的JSON。但根据当前的指令，“将产品从1拿到2”，这里的源是1，目标是2，而原规则中可能有错误，因为“Y工位”对应的是源头，而“A库位”是目的地。所以需要确认是否用户意图正确。如果按照规则中的示例，当用户说“关节从Y拿去A库位”，反馈的source和target分别是1和5。但当前用户的指令是源1，目标2，这可能不符合原规则中的结构。这时候应该检查是否有其他可能性，或者根据规则判断是否意图明确。如果用户输入的是正确的源和目标，那么按照规则生成JSON；否则，可能需要回复意图不明确。不过根据问题描述，用户明确给出了命令示例，所以可能正确理解为源1，目标2，因此生成对应的JSON。
+
+
+{"source":"1","target":"2"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“将产品从一拿到二”。首先需要确认用户的意图是什么。根据规则，命令示例中的“关节”是从Y工位拿到仓库“A库位”，所以这里的动作应该是搬运物品。用户提到的“一”和“二”对应的是源头和目的地，但需要检查是否符合规则中的源、目标定义。
+
+规则中指出，源包括1到4的工位，而目标包括1到9的库位。用户说“从一拿到二”，即源是1，目标是2。因此，正确的反馈应该是{"source":"1","target":"2"}。同时，需要确保没有其他意图被误判，比如如果用户有其他动作，但当前只提到了搬运产品，所以意图明确。
+
+
+{"source":"1","target":"2"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“将产品从一拿到了二”。首先需要确认这里的“一”和“二”分别对应哪个工位。根据规则，源头是“Y工位”，而目的地是“A库位”。但用户提到的“一”和“二”可能指的是源工位号和目标工位号。不过原问题中的命令示例显示，“关节”从“Y工位”拿到仓库“A”库位，所以这里的“Y工位”是源头，而“A”库位是目的地。但用户现在说“将产品从一拿到了二”，可能需要确认是否正确对应源和目标。
+
+另外，用户可能希望得到反馈的JSON结构，即当识别到意图时返回对应的source和target。例如，“开始打磨”会反馈{"kaishidamo":"1"}。当前用户的命令是“将产品从一拿到了二”，但这里的“一”和“二”是否正确对应源和目标呢？根据规则，源头是Y工位，而目的地是A库位，所以可能需要确认用户意图是否明确。
+
+如果用户的意思确实是将产品从Y工位（源）运送到A库位（目标），那么对应的JSON应该是{"source":"1","target":"5"}。但这里可能存在混淆，因为原问题中的命令示例中“关节”是从Y拿到了A，而这里的“一”和“二”可能对应不同的位置。需要进一步确认用户的意图是否正确映射到规则中的源和目标。
+
+总结：用户提到的“将产品从一拿到了二”，可能需要根据规则中的源头（Y工位）和目的地（A库位）来反馈，但具体到“一”和“二”的对应关系可能需要更明确的信息。因此，正确的做法是确认意图是否符合规则，并生成对应的JSON。
+
+
+{"source":"1","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“将产品从一拿到二”。首先需要确认这里的“一”和“二”分别对应哪个工位。根据规则，“Y工位”是源头，“A库位”是目的地。所以这里应该把“1”作为源，而“2”作为目标。然后要检查是否有其他可能的意图被误解，但用户明确提到拿产品，所以没有问题。接下来需要生成对应的JSON反馈，确保source和target正确，并且符合规则中的示例。
+
+
+{"source":"1","target":"2"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 432, 当前线程: 13180)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说要把产品从“一”拿到“二”。首先需要确认用户的意图是否符合规则中的条件。根据规则1，“关节”从“Y工位”拿到仓库“A库位”，这里的“Y工位”和“A库位”是源头和目的地。但用户提到的是“产品”而不是“关节”，所以可能需要调整。不过，用户可能希望将产品从一个工位移动到另一个，而规则中的例子是关于关节的。这时候可能存在混淆，或者用户可能有其他意图未被明确表达。
+
+接下来，检查是否有其他可能的意图。例如，“开始打磨”对应的是信号1，但当前用户没有提到任何动作或命令，只是陈述了物品的位置变化。因此，用户的意图可能是移动产品，但规则中的例子是关于关节的，这可能存在不一致的情况。需要确认是否用户希望将“关节”视为产品，并且按照规则执行，或者是否有其他意图未被识别。
+
+根据规则3，当识别到“开始打磨”，需要反馈{"kaishidamo":"1"}。而当前用户的指令是移动产品，没有涉及动作信号，因此可能意图不明确。但根据用户提供的示例，如果存在类似的命令，应该按照规则处理。这里可能存在输入错误或误解，需要进一步确认。
+
+最终判断：用户的意图是将产品从“一”移到“二”，但规则中的例子是关于关节的移动，这可能意味着用户希望遵循该规则，即使当前指令不完全匹配。因此，应反馈对应的JSON，并指出可能的意图差异。
+
+
+{"source":"1","target":"2"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“将产品部分拿到四”。首先，我需要确认用户的意图是什么。根据规则，人的命令示例中提到的“拿”动作可能对应不同的工位和库位。
+
+用户提到的是“产品部分”，所以可能是从某个源地拿到目标地。规则中的源头包括1-4工位，而目的地有1-9库位。用户说“拿到四”，这里的“四”应该是指目的地是第四个库位，也就是“4”。因此，正确的source应该是4，target也是4。
+
+接下来需要检查是否有其他可能的意图被误解。比如，是否有可能用户想表达的是拿产品到某个特定的位置，但根据规则中的示例，“关节”从Y工位拿到A库位，所以这里的动作应该对应源和目标的正确位置。因此，正确的反馈应该是{"source":"4","target":"4"}。
+
+确认没有歧义后，生成对应的JSON响应。
+
+
+```json
+{
+  "source": "4",
+  "target": "4"
+}
+```, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 432, 当前线程: 13180)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“将 产品 总算 拿到 四”。首先，我需要分析这句话的结构和可能的意图。看起来用户是在描述一个动作，即拿取某个物品。但中文里“总算是”后面接的是“产品”，而“拿到四”中的“四”可能指的是库位或工位。
+
+接下来，检查是否有符合规则的意图。根据规则1，“关节”从“Y工位”拿到仓库“A”库位；其中源点包括1-4，目标包括1-9。用户提到的是“产品总算是拿到四”，这里的“四”可能对应的是某个具体的库位或工位编号。但中文里通常不会直接说“拿到四”，而是用数字表示，比如“仓库4”。因此，“拿到四”可能是用户想表达拿取仓库4的产品。
+
+然后，确认是否有其他可能的意图被忽略。例如，是否有可能是“开始打磨”这样的命令？但用户当前的输入是关于物品的拿取，而不是动作开始。所以应该按照规则1来处理。
+
+最后，根据规则3，当识别到类似的指令时，需要反馈对应的JSON。这里用户的意图应该是拿取仓库4的产品，因此正确的响应应该是{"source":"4","target":"5"}，因为“四”对应的是源点中的4，而目标是5库位。
+
+
+{"source":"4","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始 打磨”。首先，我需要确认用户的意图是什么。根据规则，当识别到“开始打磨”时，应该反馈{"kaishidamo":"1"}。这里的关键是用户明确使用了“开始”这个词，并且提到了“打磨”，这符合指令中的命令示例。因此，正确的回应应该是生成对应的JSON对象，其中kaishidamo设置为1。
+
+
+{"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始 打磨”。首先，我需要确认用户的意图是什么。根据规则，当识别到“开始打磨”时，应该反馈{"kaishidamo":"1"}。这里的关键是用户明确使用了“开始”这个词，并且提到了“打磨”，这符合指令中的命令示例。因此，正确的回应应该是生成对应的JSON对象，确保source和target的值正确对应。同时，要检查是否有其他可能的意图需要处理，但在这个例子中没有歧义，所以直接返回结果即可。
+
+
+{"kaishidamo":"1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 432, 当前线程: 13180)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“产品 从而 拿到 三”，看起来他们可能是在询问如何拿取某个物品。根据之前的规则，当有拿取动作时，需要确认源头和目的地。这里的关键词是“产品”和“三”，但具体指代哪个工位还不清楚。
+
+首先，“三”可能指的是目标库位中的第三个位置，比如“3号库位”。然后，“产品”可能对应某个工位，但用户没有明确说明。根据规则1，源头包括“1到4工位”，而目的地是“1到9库位”。所以需要进一步确认用户想拿取的是哪个具体的产品或物品。
+
+如果用户只是简单地提到“三”，可能需要更多的上下文来确定正确的源和目标。因此，可能需要询问用户更具体的指令，以便准确识别意图。但根据当前的信息，只能假设“三”是目的地，而产品可能是某个工位中的物品。不过，由于信息有限，无法确定确切的源头和目标，所以应该回复意图不明确。
+
+
+意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 432, 当前线程: 13180)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户说“将 产品 从 二 拿到 三”。首先，我需要确认用户的意图。根据规则，命令示例中的“关节”是从Y工位拿到A库位，所以这里的动作应该是类似的操作。
+
+用户提到的是“产品”，所以应该理解为物品的移动。接下来，分析源头和目的地。原句是“从二拿到三”，所以源头是2号工位，目标是3号库位。根据规则，源工位编号是1-4，目标也是1-9中的一个。
+
+然后，检查是否有其他可能的意图被忽略。用户没有提到开始打磨或其他动作，因此只有这个移动指令。确认符合所有规则后，生成对应的JSON反馈。
+
+
+{"source":"2","target":"3"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27600, 当前线程: 27248)
+[FATAL] listen_loop异常: Stream not open
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-21 职院（锡职大）项目\汇总\2025-08-08\语音识别整合_v1.3\整合\vosk_module.py", line 53, in recognize_speech
+    data = stream.read(1024, exception_on_overflow=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\fanqi\anaconda3\Lib\site-packages\pyaudio\__init__.py", line 570, in read
+    return pa.read_stream(self._stream, num_frames,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno -9999] Unanticipated host error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-21 职院（锡职大）项目\汇总\2025-08-08\语音识别整合_v1.3\整合\ui_main.py", line 472, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-21 职院（锡职大）项目\汇总\2025-08-08\语音识别整合_v1.3\整合\vosk_module.py", line 64, in recognize_speech
+    stream.stop_stream()
+  File "C:\Users\fanqi\anaconda3\Lib\site-packages\pyaudio\__init__.py", line 500, in stop_stream
+    pa.stop_stream(self._stream)
+OSError: Stream not open
+
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到这个命令时，需要反馈{"kaishidamo":"1"}。首先确认用户的意图是否符合要求。这里的“开始打磨”确实对应规则中的“kaishidamo": "1"，所以直接生成对应的JSON即可。不需要额外的信息或解释，因为用户明确给出了这个指令。
+
+
+{"kaishidamo":"1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 9876, 当前线程: 5240)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到这个命令时，需要反馈{"kaishidamo":"1"}。首先确认用户的意图是否符合规则中的示例。这里的“开始打磨”确实对应规则中的“kaishidamo":1的信号，所以直接生成对应的JSON即可。不需要额外的信息或解释，因为用户明确给出了这个指令。
+
+
+{"kaishidamo":"1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 28796, 当前线程: 19648)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“kaishi damo”，这看起来像是一个命令或者信号。根据之前的规则，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。但用户输入的关键词是“kaishi damo”，可能是一个拼写错误或者误输入。我需要确认用户的意图是否正确。
+
+首先，检查是否有其他可能的意图。例如，“关节”从“Y工位”拿到仓库“A库位”的例子中，源和目标都是明确的。而用户现在没有提到具体的动作或位置，只是发来了“kaishi damo”。这可能意味着用户希望触发开始打磨的动作，但输入的关键词不准确。
+
+接下来，根据规则3，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。如果用户的输入是正确的命令，那么应该按照这个格式返回。但如果存在拼写错误或误解，可能需要进一步澄清。不过根据现有信息，用户发来的内容符合“开始打磨”的信号，因此应按照规则处理。
+
+最后，确保回复的JSON结构正确，并且没有其他多余的信息。确认无误后，生成相应的响应。
+
+
+{"kaishidamo":"1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 11692, 当前线程: 16008)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“kaishidamo”，也就是开始打磨的信号。根据规则，当识别到这个命令时，需要反馈{"kaishidamo":"1"}。我需要确认是否符合所有条件，比如是否有其他可能的意图被误判。但根据提供的示例和规则，这里明显是正确的处理方式。因此，直接返回对应的JSON即可。
+
+
+{"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"2","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确。, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到这个命令时，需要反馈{"kaishidamo":"1"}。首先确认用户的意图是否符合要求，这里明显是开始打磨的动作，所以直接按照规则生成对应的JSON响应即可。
+
+
+{"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始打磨”。根据规则，当识别到“开始打磨”时，需要反馈{"kaishidamo":"1"}。这里的关键是确认用户的意图是否符合规则中的示例。用户直接说“开始打磨”，这对应到规则中的命令示例，所以应该正确反馈。不需要额外的信息或解释，只需按照指示生成JSON。
+
+
+{"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer=好的，用户发来的是“开始阿莫”。首先，我需要确认用户的意图是什么。根据规则，当识别到“开始打磨”时，应该反馈{"kaishidamo":"1"}。但这里用户用了“开始阿莫”，可能是一个拼写错误或者误用。不过，按照规则，如果用户说的命令是“开始打磨”，那么对应的JSON应该是{"kaishidamo":"1"}。因此，我需要检查是否有其他意图被识别出来，但根据当前的信息，“开始阿莫”似乎不符合任何已知的指令。所以正确的回应应该是意图不明确。
+
+
+意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer={"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 6724)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"1","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"kaishidamo":"1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"4","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"4","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"kaishidamo":"1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"4"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"4","target":"6"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[DEBUG] process_next: TTS播报前参数: answer={"source":"3","target":"5"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 3540, 当前线程: 3660)
+[FATAL] listen_loop异常: Stream not open
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-21 职院（锡职大）项目\汇总\2025-08-08\语音识别整合_v1.3\整合\vosk_module.py", line 53, in recognize_speech
+    data = stream.read(1024, exception_on_overflow=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\fanqi\anaconda3\Lib\site-packages\pyaudio\__init__.py", line 570, in read
+    return pa.read_stream(self._stream, num_frames,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno -9999] Unanticipated host error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-21 职院（锡职大）项目\汇总\2025-08-08\语音识别整合_v1.3\整合\ui_main.py", line 516, in listen_loop
+    text = vosk_module.recognize_speech(self.vosk_model_path, stop_event=self.listen_stop_event, discard_event=self.listen_discard_event)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\快盘\Work\ChuangChi\Work Everyday\2025\2025-07-21 职院（锡职大）项目\汇总\2025-08-08\语音识别整合_v1.3\整合\vosk_module.py", line 64, in recognize_speech
+    stream.stop_stream()
+  File "C:\Users\fanqi\anaconda3\Lib\site-packages\pyaudio\__init__.py", line 500, in stop_stream
+    pa.stop_stream(self._stream)
+OSError: Stream not open
+
+[DEBUG] process_next: TTS播报前参数: answer={"kaishidamo": "1"}, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27016, 当前线程: 7684)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27016, 当前线程: 7684)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27016, 当前线程: 7684)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27016, 当前线程: 7684)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27016, 当前线程: 7684)
+[DEBUG] process_next: TTS播报前参数: answer=意图不明确, tts_stop_event=False
+[DEBUG] process_next: 开始TTS播报 (主线程: 27016, 当前线程: 7684)
