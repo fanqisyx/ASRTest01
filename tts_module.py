@@ -8,7 +8,12 @@ import pyttsx3
 
 class TTSManager:
     def __init__(self):
+        # pyttsx3 引擎实例（仅在 _engine_lock 保护下读/写）
         self._engine = None
+        # 引擎并发保护锁：避免 stop()/重建 与 worker 并发操作引擎产生竞态
+        self._engine_lock = threading.RLock()
+        # 请求重建引擎的标志：由 stop_current() 或异常触发，worker 在安全点执行重建
+        self._reset_requested = threading.Event()
         self._tts_thread = None
         self._tts_queue = queue.Queue()
         self._stop_event = threading.Event()
@@ -18,19 +23,25 @@ class TTSManager:
     
     def _init_engine(self):
         """只初始化一次TTS引擎"""
-        if self._engine is None:
-            try:
-                self._engine = pyttsx3.init()
-                voices = self._engine.getProperty('voices')
-                for voice in voices:
-                    if any(keyword in voice.name.lower() 
-                          for keyword in ["chinese", "huihui", "lili", "ting-ting"]):
-                        self._engine.setProperty('voice', voice.id)
-                        print(f"[TTS] 选中voice: {voice.name}")
-                        break
-            except Exception as e:
-                print(f"[TTS] 初始化引擎失败: {e}")
-                self._engine = None
+        with self._engine_lock:
+            if self._engine is None:
+                try:
+                    engine = pyttsx3.init()
+                    # 尝试优先选择中文语音
+                    try:
+                        voices = engine.getProperty('voices')
+                        for voice in voices:
+                            if any(keyword in voice.name.lower() for keyword in ["chinese", "huihui", "lili", "ting-ting"]):
+                                engine.setProperty('voice', voice.id)
+                                print(f"[TTS] 选中voice: {voice.name}")
+                                break
+                    except Exception:
+                        # 语音获取失败不影响引擎可用性
+                        pass
+                    self._engine = engine
+                except Exception as e:
+                    print(f"[TTS] 初始化引擎失败: {e}")
+                    self._engine = None
     
     def _start_worker(self):
         """启动TTS工作线程"""
@@ -38,6 +49,27 @@ class TTSManager:
             self._tts_thread = threading.Thread(target=self._worker_loop, daemon=True)
             self._tts_thread.start()
     
+    def _request_engine_reset(self):
+        """标记需要在安全点重建引擎（由worker执行）。"""
+        self._reset_requested.set()
+
+    def _rebuild_engine_if_needed(self):
+        """如收到重建请求，则在worker安全点重建引擎。"""
+        if self._reset_requested.is_set():
+            with self._engine_lock:
+                try:
+                    # 优先尝试停止当前引擎（若仍存在）
+                    if self._engine is not None:
+                        try:
+                            self._engine.stop()
+                        except Exception:
+                            pass
+                finally:
+                    # 重新创建引擎
+                    self._engine = None
+                    self._reset_requested.clear()
+                    self._init_engine()
+
     def _worker_loop(self):
         """TTS工作循环，避免并发问题"""
         while not self._stop_event.is_set():
@@ -53,16 +85,20 @@ class TTSManager:
                     continue
                 
                 # 执行TTS播报
-                if self._engine:
+                local_engine = None
+                with self._engine_lock:
+                    local_engine = self._engine
+                if local_engine:
                     try:
                         print(f"[TTS] 开始播报: {text}")
-                        self._engine.say(text)
-                        self._engine.runAndWait()
+                        # 注意：不在锁内长时间阻塞，允许 stop() 并发打断
+                        local_engine.say(text)
+                        local_engine.runAndWait()
                         print(f"[TTS] 播报完成: {text}")
                     except Exception as e:
                         print(f"[TTS] 播报异常: {e}")
-                        # 重新初始化引擎
-                        self._init_engine()
+                        # 请求在安全点重建引擎
+                        self._request_engine_reset()
                 
                 # 调用完成回调
                 if callback:
@@ -70,6 +106,9 @@ class TTSManager:
                         callback()
                     except Exception as e:
                         print(f"[TTS] 回调异常: {e}")
+                
+                # 播放完成后在安全点处理引擎重建
+                self._rebuild_engine_if_needed()
                 
             except queue.Empty:
                 continue
@@ -92,13 +131,15 @@ class TTSManager:
             except queue.Empty:
                 break
         
-        # 重新初始化引擎来强制停止
-        if self._engine:
-            try:
-                self._engine.stop()
-            except:
-                pass
-        self._init_engine()
+        # 尝试停止引擎当前播放（允许在worker线程中的 runAndWait 被打断）
+        with self._engine_lock:
+            if self._engine:
+                try:
+                    self._engine.stop()
+                except Exception:
+                    pass
+        # 请求在安全点重建引擎，避免与worker并发直接替换引擎
+        self._request_engine_reset()
     
     def shutdown(self):
         """关闭TTS管理器"""

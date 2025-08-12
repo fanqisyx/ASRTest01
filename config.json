@@ -9,5 +9,5 @@
   "autostop_time": "30",
   "no_think": false,
   "tts_delay_mode": "fixed",
-  "tts_fixed_delay": "1"
+  "tts_fixed_delay": "3"
 }
