@@ -748,6 +748,14 @@ class MainWindow(QtWidgets.QWidget):
                             msg_think = f"[{nowstr()}] [思考] {thinking}"
                             self.append_text(msg_think)
                             log_with_time(f"[思考] {thinking}")
+                        if not answer:
+                            # 若无回答，给出友好提示并跳过TTS
+                            err_msg = f"[{nowstr()}] [系统] AI未返回有效回答（可能网络/服务异常）。"
+                            self.append_text(err_msg)
+                            log_with_time("[系统] AI未返回有效回答，已跳过TTS")
+                            # 恢复状态并继续下一轮
+                            self.listen_discard_event.clear()
+                            continue
                         msg_ai = f"[{nowstr()}] [AI] {answer}"
                         self.append_text(msg_ai)
                         log_with_time(f"[AI] {answer}")
