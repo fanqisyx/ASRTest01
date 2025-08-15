@@ -9,6 +9,7 @@ import os
 import re
 import queue
 from PyQt5 import QtWidgets, QtCore, QtGui
+from logger_util import debug as logd, info as logi, warning as logw, error as loge, exception as logx
 from vosk_module import recognize_speech
 from tts_module import speak_text, speak_text_safe
 try:
@@ -23,6 +24,10 @@ from pypinyin import lazy_pinyin
 def log_with_time(msg):
     t = datetime.datetime.now().strftime("%H:%M:%S")
     print(f"[{t}] {msg}")
+    try:
+        logi(msg)
+    except Exception:
+        pass
 
 
 class LightIndicator(QtWidgets.QWidget):
@@ -138,6 +143,10 @@ class MainWindow(QtWidgets.QWidget):
         self._tts_worker_thread = threading.Thread(target=self._tts_worker, daemon=True)
         self._tts_worker_thread.start()
         log_with_time("[TTS] 串行TTS工作线程已启动")
+        try:
+            logi("[BOOT] TTS worker started")
+        except Exception:
+            pass
 
     def _enqueue_tts(self, text, priority=False):
         """加入TTS任务。priority=True用于JSON确认优先播报"""
@@ -147,7 +156,12 @@ class MainWindow(QtWidgets.QWidget):
             prio = 0 if priority else 1
             heapq.heappush(self._tts_pq, (prio, self._tts_seq, text))
             self._tts_event.set()
-        log_with_time(f"[TTS] 入队: prio={prio} text={(text[:40] + '...' if len(text)>40 else text)}")
+        snippet = (text[:200] + '...') if len(text) > 200 else text
+        log_with_time(f"[TTS] 入队: prio={prio} len={len(text)} text={snippet}")
+        try:
+            logi(f"TTS_ENQUEUE prio={prio} len={len(text)}")
+        except Exception:
+            pass
 
     def _tts_worker(self):
         import heapq
@@ -163,12 +177,16 @@ class MainWindow(QtWidgets.QWidget):
                     # 播放前暂停收音
                     self.listen_pause.set()
                     self.set_status_light(False)
+                    logi(f"TTS_START len={len(text)}")
                     self._safe_speak(text)
+                    logi("TTS_END")
                     delay = self._compute_tts_delay(len(text))
                     log_with_time(f"[TTS] 播放完成，延迟{delay:.2f}s后恢复收音")
+                    logi(f"TTS_DELAY {delay:.2f}s")
                     time.sleep(delay)
                 except Exception as e:
                     log_with_time(f"[TTS] _tts_worker异常: {e}")
+                    logx("TTS_WORKER_EXCEPTION")
                 finally:
                     self.listen_pause.clear()
                     if self.listening:
@@ -706,15 +724,19 @@ class MainWindow(QtWidgets.QWidget):
         def _process():
             try:
                 log_with_time("[DEBUG] process_next: 进入processing主线程")
+                logi("PROC_ENTER processing loop")
                 while self.listening or not self.voice_queue.empty():
                     try:
                         if self.voice_queue.empty():
                             time.sleep(0.05)
                             continue
                         text = self.voice_queue.get()
-                        log_with_time(f"[DEBUG] process_next: 取出队列文本: {text}")
+                        snippet = (text[:200] + '...') if len(text) > 200 else text
+                        log_with_time(f"[DEBUG] process_next: 取出队列文本(len={len(text)}): {snippet}")
+                        logi(f"QUEUE_POP len={len(text)}")
                         if text and len(text.strip()) == 1:
                             log_with_time(f"[DEBUG] process_next: 1字噪音丢弃: {text}")
+                            logi("QUEUE_DROP_1CHAR")
                             continue
                         self.update_queue_list()
                         msg_user = f"[{nowstr()}] [你] {text}"
@@ -723,6 +745,7 @@ class MainWindow(QtWidgets.QWidget):
                         msg_sys = f"[{nowstr()}] [系统] 正在加载模型与生成回复..."
                         self.append_text(msg_sys)
                         log_with_time("[系统] 正在加载模型与生成回复...")
+                        logi("LLM_PREPARE")
                         self.listen_pause.set()
                         self.set_status_light(False)
                         if hasattr(self, '_countdown_timer') and self._countdown_timer:
@@ -737,9 +760,14 @@ class MainWindow(QtWidgets.QWidget):
                                 pass
                         try:
                             send_text = text + " /no_think" if getattr(self, 'no_think', False) else text
+                            logi(f"LLM_REQ url={self.lmstudio_url} model={self.lmstudio_model} len={len(send_text)}")
+                            t0 = time.time()
                             thinking, answer = query_lmstudio(send_text, self.lmstudio_url, self.lmstudio_model)
+                            t1 = time.time()
+                            logi(f"LLM_RESP dt={(t1-t0):.3f}s think_len={len(thinking) if thinking else 0} ans_len={len(answer) if answer else 0}")
                         except Exception as e:
                             log_with_time(f"[ERROR] query_lmstudio异常: {e}")
+                            logx("LLM_EXCEPTION")
                             self.append_text(f"[{nowstr()}] [系统] AI回复异常: {e}")
                             answer = "抱歉，AI回复失败。"
                             thinking = None
@@ -753,6 +781,7 @@ class MainWindow(QtWidgets.QWidget):
                             err_msg = f"[{nowstr()}] [系统] AI未返回有效回答（可能网络/服务异常）。"
                             self.append_text(err_msg)
                             log_with_time("[系统] AI未返回有效回答，已跳过TTS")
+                            logw("LLM_EMPTY_ANSWER")
                             # 恢复状态并继续下一轮
                             self.listen_discard_event.clear()
                             continue
@@ -764,6 +793,7 @@ class MainWindow(QtWidgets.QWidget):
                         import json, traceback
                         try:
                             log_with_time(f"[DEBUG] process_next: TTS准备阶段 answer长度={len(answer)}")
+                            logi(f"TTS_PREP ans_len={len(answer)}")
                             tts_text = answer
                             is_json_command = False
                             try:
@@ -776,39 +806,49 @@ class MainWindow(QtWidgets.QWidget):
                                     tts_text = "开始打磨命令已收到"
                                     is_json_command = True
                                     log_with_time("[DEBUG] JSON包含kaishidamo=1 -> action_damo.txt 写入并播报: 开始打磨命令已收到")
+                                    logi("JSON_OUT action_damo.txt (kaishidamo=1)")
                                 elif "source" in parsed:
                                     with open("model_command.txt", "w", encoding="utf-8") as f:
                                         f.write(json.dumps(enhanced_json, ensure_ascii=False, indent=2))
                                     tts_text = "产品入库命令已收到"
                                     is_json_command = True
                                     log_with_time("[DEBUG] JSON包含source -> model_command.txt 写入并播报: 产品入库命令已收到")
+                                    logi("JSON_OUT model_command.txt (source present)")
                                 else:
                                     with open("model_command.txt", "w", encoding="utf-8") as f:
                                         f.write(json.dumps(enhanced_json, ensure_ascii=False, indent=2))
                                     tts_text = "命令已收到"
                                     is_json_command = True
                                     log_with_time("[DEBUG] JSON无kaishidamo/source -> 使用通用播报: 命令已收到")
+                                    logi("JSON_OUT model_command.txt (generic)")
                             except Exception:
                                 pass
                             self._enqueue_tts(tts_text, priority=is_json_command)
                             log_with_time(f"[DEBUG] process_next: 已入队TTS priority={is_json_command}")
+                            logi(f"TTS_ENQUEUED priority={is_json_command} len={len(tts_text)}")
                         except Exception as e:
                             log_with_time(f"[ERROR] TTS阶段异常: {e}\n{traceback.format_exc()}")
+                            logx("TTS_PREP_EXCEPTION")
                             self.append_text(f"[{nowstr()}] [系统] TTS阶段异常: {e}")
                         finally:
                             self.listen_discard_event.clear()
                             log_with_time("[DEBUG] process_next: 本轮处理结束")
+                            logi("PROC_ITER_END")
                     except Exception as loop_e:
                         import traceback
                         log_with_time(f"[ERROR] process_next内部循环异常: {loop_e}\n{traceback.format_exc()}")
+                        logx("PROC_LOOP_EXCEPTION")
                 log_with_time("[DEBUG] process_next: 处理循环退出 (listening=%s queue_empty=%s)" % (self.listening, self.voice_queue.empty()))
+                logi(f"PROC_EXIT listening={self.listening} queue_empty={self.voice_queue.empty()}")
             except Exception as e:
                 import traceback
                 log_with_time(f"[ERROR] process_next主异常: {e}\n{traceback.format_exc()}")
+                logx("PROC_MAIN_EXCEPTION")
             finally:
                 with self.process_lock:
                     self.processing = False
                 log_with_time("[DEBUG] process_next: processing标志已清除")
+                logi("PROC_FLAG_CLEARED")
         threading.Thread(target=_process, daemon=True).start()
 
     def update_queue_list(self):

@@ -3,6 +3,7 @@ import requests
 import json
 import time
 import re
+from logger_util import info as logi, warning as logw, exception as logx
 
 DEFAULT_CONNECT_TIMEOUT = 3  # 秒
 DEFAULT_READ_TIMEOUT = 60    # 秒
@@ -46,38 +47,49 @@ def query_lmstudio(text, api_url, model_name=None,
     last_err_msg = None
     for attempt in range(retries + 1):
         try:
+            logi(f"LM_REQ attempt={attempt} url={api_url} model={model_name} len={len(text)}")
             resp = session.post(api_url, json=payload, timeout=timeout,
                                  proxies={"http": None, "https": None})
             if resp.status_code == 200:
                 try:
                     data = resp.json()
                 except Exception as je:
+                    logx(f"LM_RESP_NOT_JSON: {je}")
                     return "[错误] 返回内容非JSON: %s" % je, ""
                 choices = data.get("choices")
                 if not choices or not isinstance(choices, list):
+                    logw("LM_RESP_NO_CHOICES")
                     return "[错误] 响应缺少choices", ""
                 first = choices[0] or {}
                 message = first.get("message") or {}
                 raw = message.get("content")
                 if not raw or not isinstance(raw, str):
+                    logw("LM_RESP_NO_CONTENT")
                     return "[错误] 响应缺少message.content", ""
                 thinking, answer = extract_think_and_answer(raw)
+                logi(f"LM_OK think_len={len(thinking) if thinking else 0} ans_len={len(answer) if answer else 0}")
                 return thinking, answer
             else:
                 last_err_msg = f"HTTP {resp.status_code}"
                 # 5xx 或 429 可重试
                 if attempt < retries and resp.status_code in (500, 502, 503, 504, 429):
                     time.sleep(backoff_base * (2 ** attempt))
+                    logw(f"LM_RETRY status={resp.status_code} next_backoff={backoff_base * (2 ** attempt):.2f}s")
                     continue
+                logw(f"LM_FAIL status={resp.status_code}")
                 return f"[错误] {last_err_msg}", ""
         except requests.Timeout as te:
             last_err_msg = f"超时: {te}"
+            logw(f"LM_TIMEOUT attempt={attempt}: {te}")
         except requests.RequestException as rexc:
             last_err_msg = f"请求异常: {rexc}"
+            logx(f"LM_REQUEST_EXC attempt={attempt}: {rexc}")
         except Exception as e:
             last_err_msg = f"未知异常: {e}"
+            logx(f"LM_UNKNOWN_EXC attempt={attempt}: {e}")
         # 异常重试（到达最后一次则返回错误）
         if attempt < retries:
             time.sleep(backoff_base * (2 ** attempt))
             continue
+        logw(f"LM_GIVEUP last_err={last_err_msg}")
         return f"[错误] {last_err_msg}", ""

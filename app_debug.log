@@ -1,0 +1,145 @@
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - TTS_ENGINE_INIT_OK
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - TTS_VOICE_SELECTED name=Microsoft Huihui Desktop - Chinese (Simplified)
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - TTS_WORKER_THREAD_STARTED
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - [TTS] MainWindow.__init__: self id=2648606685904
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - [TTS] MainWindow.__init__: signal connect result=<PyQt5.QtCore.QMetaObject.Connection object at 0x00000268A9DB55C0> (使用QueuedConnection)
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - 重置action_damo.txt文件kaishidamo为0: {'id': '2025-08-14 21:00:57', 'kaishidamo': '0'}
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - [系统] model_command.txt已在启动时清空
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - [TTS] 串行TTS工作线程已启动
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - [BOOT] TTS worker started
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - [TTS] test_signal_connection: 开始测试信号槽, self id=2648606685904
+2025-08-14 21:00:57 [INFO] [MainThread] asr_app logger_util:45 - [TTS] test_signal_connection: 测试信号已发出
+2025-08-14 21:00:58 [INFO] [MainThread] asr_app logger_util:45 - [TTS] _tts_on_main_thread: 进入函数, text=测试信号, self id=2648606685904
+2025-08-14 21:00:58 [INFO] [MainThread] asr_app logger_util:45 - [TTS] _tts_on_main_thread: 设置listen_pause，暂停收音
+2025-08-14 21:00:58 [INFO] [MainThread] asr_app logger_util:45 - [TTS] _tts_on_main_thread: 调用speak_text_interruptable
+2025-08-14 21:00:58 [INFO] [MainThread] asr_app logger_util:45 - TTS_QUEUE_PUSH len=4
+2025-08-14 21:00:58 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN start len=4
+2025-08-14 21:00:58 [INFO] [MainThread] asr_app logger_util:45 - [TTS] _tts_on_main_thread: speak_text_interruptable返回，准备估算延迟
+2025-08-14 21:00:58 [INFO] [MainThread] asr_app logger_util:45 - [TTS] _tts_on_main_thread: 朗读结束，延迟3.00秒后恢复收音
+2025-08-14 21:01:01 [INFO] [MainThread] asr_app logger_util:45 - [TTS] _tts_on_main_thread: 延迟结束，准备恢复收音
+2025-08-14 21:01:01 [INFO] [MainThread] asr_app logger_util:45 - [TTS] _tts_on_main_thread: 已恢复收音
+2025-08-14 21:01:01 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN done
+2025-08-14 21:01:08 [INFO] [MainThread] asr_app logger_util:45 - [21:01:08] [系统] 开始聆听（唤醒词模式）...
+2025-08-14 21:01:08 [INFO] [Thread-3 (listen_loop)] asr_app logger_util:45 - [系统] 正在加载语音识别模型...
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 进入processing主线程
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - PROC_ENTER processing loop
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 取出队列文本(len=3): 123
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - QUEUE_POP len=3
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [你] 123
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [系统] 正在加载模型与生成回复...
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_PREPARE
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_REQ url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=3
+2025-08-14 21:01:17 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_REQ attempt=0 url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=3
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_OK think_len=0 ans_len=5
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_RESP dt=7.047s think_len=0 ans_len=5
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [AI] 意图不明确
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: TTS准备阶段 answer长度=5
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_PREP ans_len=5
+2025-08-14 21:01:24 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_START len=5
+2025-08-14 21:01:24 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_QUEUE_PUSH len=5
+2025-08-14 21:01:24 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN start len=5
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [TTS] 入队: prio=1 len=5 text=意图不明确
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUE prio=1 len=5
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 已入队TTS priority=False
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUED priority=False len=5
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 本轮处理结束
+2025-08-14 21:01:24 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - PROC_ITER_END
+2025-08-14 21:01:25 [INFO] [Thread-3 (listen_loop)] asr_app logger_util:45 - [系统] 语音识别模型已就绪
+2025-08-14 21:01:26 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN done
+2025-08-14 21:01:26 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] _safe_speak: 播报完成: 意图不明确
+2025-08-14 21:01:26 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_END
+2025-08-14 21:01:26 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] 播放完成，延迟3.00s后恢复收音
+2025-08-14 21:01:26 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_DELAY 3.00s
+2025-08-14 21:01:34 [INFO] [MainThread] asr_app logger_util:45 - [DEBUG] process_next: 已在processing中(加锁检查)，返回
+2025-08-14 21:01:34 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 取出队列文本(len=5): nihao
+2025-08-14 21:01:34 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - QUEUE_POP len=5
+2025-08-14 21:01:34 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [你] nihao
+2025-08-14 21:01:34 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [系统] 正在加载模型与生成回复...
+2025-08-14 21:01:34 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_PREPARE
+2025-08-14 21:01:34 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_REQ url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=5
+2025-08-14 21:01:34 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_REQ attempt=0 url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_OK think_len=0 ans_len=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_RESP dt=5.113s think_len=0 ans_len=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [AI] 意图不明确
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: TTS准备阶段 answer长度=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_PREP ans_len=5
+2025-08-14 21:01:39 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_START len=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [TTS] 入队: prio=1 len=5 text=意图不明确
+2025-08-14 21:01:39 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_QUEUE_PUSH len=5
+2025-08-14 21:01:39 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN start len=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUE prio=1 len=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 已入队TTS priority=False
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUED priority=False len=5
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 本轮处理结束
+2025-08-14 21:01:39 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - PROC_ITER_END
+2025-08-14 21:01:41 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN done
+2025-08-14 21:01:41 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] _safe_speak: 播报完成: 意图不明确
+2025-08-14 21:01:41 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_END
+2025-08-14 21:01:41 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] 播放完成，延迟3.00s后恢复收音
+2025-08-14 21:01:41 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_DELAY 3.00s
+2025-08-14 21:01:49 [INFO] [MainThread] asr_app logger_util:45 - [DEBUG] process_next: 已在processing中(加锁检查)，返回
+2025-08-14 21:01:49 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 取出队列文本(len=10): kaishidamo
+2025-08-14 21:01:49 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - QUEUE_POP len=10
+2025-08-14 21:01:49 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [你] kaishidamo
+2025-08-14 21:01:49 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [系统] 正在加载模型与生成回复...
+2025-08-14 21:01:49 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_PREPARE
+2025-08-14 21:01:49 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_REQ url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=10
+2025-08-14 21:01:49 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_REQ attempt=0 url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=10
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_OK think_len=0 ans_len=19
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_RESP dt=3.690s think_len=0 ans_len=19
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [AI] {"kaishidamo": "1"}
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: TTS准备阶段 answer长度=19
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_PREP ans_len=19
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] JSON包含kaishidamo=1 -> action_damo.txt 写入并播报: 开始打磨命令已收到
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - JSON_OUT action_damo.txt (kaishidamo=1)
+2025-08-14 21:01:52 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_START len=9
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [TTS] 入队: prio=0 len=9 text=开始打磨命令已收到
+2025-08-14 21:01:52 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_QUEUE_PUSH len=9
+2025-08-14 21:01:52 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN start len=9
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUE prio=0 len=9
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 已入队TTS priority=True
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUED priority=True len=9
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 本轮处理结束
+2025-08-14 21:01:52 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - PROC_ITER_END
+2025-08-14 21:01:55 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN done
+2025-08-14 21:01:55 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] _safe_speak: 播报完成: 开始打磨命令已收到
+2025-08-14 21:01:55 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_END
+2025-08-14 21:01:55 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] 播放完成，延迟3.00s后恢复收音
+2025-08-14 21:01:55 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_DELAY 3.00s
+2025-08-14 21:02:12 [INFO] [MainThread] asr_app logger_util:45 - [DEBUG] process_next: 已在processing中(加锁检查)，返回
+2025-08-14 21:02:12 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 取出队列文本(len=8): 将产品从1拿到3
+2025-08-14 21:02:12 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - QUEUE_POP len=8
+2025-08-14 21:02:12 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [你] 将产品从1拿到3
+2025-08-14 21:02:12 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [系统] 正在加载模型与生成回复...
+2025-08-14 21:02:12 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_PREPARE
+2025-08-14 21:02:12 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_REQ url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=8
+2025-08-14 21:02:12 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_REQ attempt=0 url=http://localhost:1234/v1/chat/completions model=llm/gguf/qwen3-0.6b-q8_0.gguf len=8
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LM_OK think_len=0 ans_len=27
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - LLM_RESP dt=4.140s think_len=0 ans_len=27
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [AI] {"source":"1","target":"3"}
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: TTS准备阶段 answer长度=27
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_PREP ans_len=27
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] JSON包含source -> model_command.txt 写入并播报: 产品入库命令已收到
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - JSON_OUT model_command.txt (source present)
+2025-08-14 21:02:16 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_START len=9
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [TTS] 入队: prio=0 len=9 text=产品入库命令已收到
+2025-08-14 21:02:16 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_QUEUE_PUSH len=9
+2025-08-14 21:02:16 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN start len=9
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUE prio=0 len=9
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 已入队TTS priority=True
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - TTS_ENQUEUED priority=True len=9
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 本轮处理结束
+2025-08-14 21:02:16 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - PROC_ITER_END
+2025-08-14 21:02:18 [INFO] [Thread-1 (_worker_loop)] asr_app logger_util:45 - TTS_RUN done
+2025-08-14 21:02:18 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] _safe_speak: 播报完成: 产品入库命令已收到
+2025-08-14 21:02:18 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_END
+2025-08-14 21:02:18 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - [TTS] 播放完成，延迟3.00s后恢复收音
+2025-08-14 21:02:18 [INFO] [Thread-2 (_tts_worker)] asr_app logger_util:45 - TTS_DELAY 3.00s
+2025-08-14 21:02:25 [INFO] [MainThread] asr_app logger_util:45 - TTS_ENGINE_STOP_CALLED
+2025-08-14 21:02:25 [INFO] [MainThread] asr_app logger_util:45 - TTS_REQUEST_ENGINE_RESET
+2025-08-14 21:02:25 [INFO] [MainThread] asr_app logger_util:45 - [21:02:25] [系统] 已停止聆听。
+2025-08-14 21:02:25 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: 处理循环退出 (listening=False queue_empty=True)
+2025-08-14 21:02:25 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - PROC_EXIT listening=False queue_empty=True
+2025-08-14 21:02:25 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - [DEBUG] process_next: processing标志已清除
+2025-08-14 21:02:25 [INFO] [Thread-4 (_process)] asr_app logger_util:45 - PROC_FLAG_CLEARED
+2025-08-14 21:02:51 [INFO] [Thread-34] asr_app logger_util:45 - [系统] 已自动退出唤醒，等待唤醒词
