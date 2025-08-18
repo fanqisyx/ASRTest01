@@ -3,12 +3,37 @@ import requests
 import json
 import time
 import re
+import os
 from logger_util import info as logi, warning as logw, exception as logx
 
 DEFAULT_CONNECT_TIMEOUT = 3  # 秒
 DEFAULT_READ_TIMEOUT = 60    # 秒
 DEFAULT_RETRIES = 2          # 失败后重试次数（总请求=1+重试次数）
 DEFAULT_BACKOFF = 0.6        # 指数退避起始秒
+
+def load_system_prompt():
+    """
+    从System_Prompt.txt文件读取系统提示词
+    """
+    try:
+        # 获取当前脚本所在目录
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        prompt_file = os.path.join(current_dir, "System_Prompt.txt")
+        
+        if os.path.exists(prompt_file):
+            with open(prompt_file, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+                logi(f"成功从{prompt_file}读取系统提示词，长度: {len(content)}")
+                return content
+        else:
+            logw(f"系统提示词文件不存在: {prompt_file}")
+            return "你是一个智能助手，请根据用户输入提供帮助。"
+    except Exception as e:
+        logx(f"读取系统提示词文件失败: {e}")
+        return "你是一个智能助手，请根据用户输入提供帮助。"
+
+# 模块加载时读取系统提示词，避免每次调用都读取文件
+SYSTEM_PROMPT = load_system_prompt()
 
 def extract_think_and_answer(text):
     """
@@ -37,6 +62,7 @@ def query_lmstudio(text, api_url, model_name=None,
     payload = {
         "model": model_name,
         "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": text}
         ]
     }
