@@ -52,17 +52,20 @@ def query_lmstudio(text, api_url, model_name=None,
                    retries: int = DEFAULT_RETRIES,
                    connect_timeout: int = DEFAULT_CONNECT_TIMEOUT,
                    read_timeout: int = DEFAULT_READ_TIMEOUT,
-                   backoff_base: float = DEFAULT_BACKOFF):
+                   backoff_base: float = DEFAULT_BACKOFF,
+                   system_prompt: str | None = None):
     """
     向LMStudio的OpenAI兼容接口发送请求，返回(思考, 回答)。
     model_name: 可选，指定模型名。
     """
     if model_name is None:
         model_name = "your-model-name"  # 可在设置中配置
+    # 允许外部覆盖系统提示词；否则回退到模块级 SYSTEM_PROMPT
+    sys_prompt = (system_prompt.strip() if isinstance(system_prompt, str) and system_prompt.strip() else SYSTEM_PROMPT)
     payload = {
         "model": model_name,
         "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": sys_prompt},
             {"role": "user", "content": text}
         ]
     }

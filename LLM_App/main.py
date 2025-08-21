@@ -177,7 +177,10 @@ class LlmWorker:
             # parameter 若非字符串，后续会 json.dumps
             return cmd, param
         except Exception:
-            return 'play', answer or ''
+            # 非 JSON：返回 command='play'，并将 parameter 改为包含 command 与 play 的 JSON 字符串
+            safe_text = answer or ''
+            param_obj = {"command": "play", "play": safe_text}
+            return 'play', json.dumps(param_obj, ensure_ascii=False)
 
 
 def main():

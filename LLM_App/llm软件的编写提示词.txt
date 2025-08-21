@@ -1,3 +1,7 @@
+2025-08-21 1958
+1、no_think开关无效
+2、回复内容不是json时，将parameter从“回复内容”改为一个json字符串，包含command和play两个字段，command为“play”，play为收到的回复内容。
+
 2025-08-21 10:25
 我们现在开始修改llm_app：
 1、llm相关的有两个数据库文件、一个txt文件（三个文件都可以通过按钮选择路径的方式选择文件）：
@@ -8,7 +12,7 @@ ii.循环读取这个数据库中的time字段，软件打开时读取一次作�
 iii.parameter字段中是一个json格式的字符串，读取其中listened字段的内容，将内容作为用户数据加上系统提示词一起发送给大模型；
 c、第二个是llm自己的数据库，数据库中有4个字段：id、time、command、parameter：
 i.软件打开时将此数据库内容清除，后续写入也是覆盖性写入数据库第一行；
-ii.id为一个自加的数据，打开软件后归零，收到大模型回复的命令后自加；time为当前时间，精确到年月日时分秒；command，当收到大模型的回复为一个json格式的字符串时，command为json字符串中“command”字段中的值。当大模型回复不是一个json字符串时，command为“play”;parameter,当收到大模型的回复为一个json格式的字符串时，parameter的值为json字符串中“parameter”字段的值。当大模型回复不是一个json字符串时，parameter为大模型回复的所有内容；
+ii.id为一个自加的数据，打开软件后归零，收到大模型回复的命令后自加；time为当前时间，精确到年月日时分秒；command，当收到大模型的回复为一个json格式的字符串时，command为json字符串中“command”字段中的值，如果没有command则为“None”。当大模型回复不是一个json字符串时，command为“play”;parameter,当收到大模型的回复为一个json格式的字符串时，parameter的值为json字符串中“parameter”字段的值。当大模型回复不是一个json字符串时，parameter为大模型回复的所有内容；
 
 
 2025-08-21 前基础

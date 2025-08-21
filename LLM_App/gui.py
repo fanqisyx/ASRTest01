@@ -12,74 +12,78 @@ class LLMWindow(QtWidgets.QWidget):
     event_sig = QtCore.pyqtSignal(str, dict)
 
     def __init__(self):
-        super().__init__()
-        self.setWindowTitle('LLM 应用')
-        self.resize(700, 520)
+            super().__init__()
+            self.setWindowTitle('LLM 应用')
+            self.resize(700, 520)
 
-        layout = QtWidgets.QFormLayout(self)
+            layout = QtWidgets.QFormLayout(self)
 
-        # 控件
-        self.api = QtWidgets.QLineEdit()
-        self.model = QtWidgets.QLineEdit()
-        self.db_path = QtWidgets.QLineEdit()  # 兼容旧字段
-        self.system_prompt_path = QtWidgets.QLineEdit()
-        self.asr_db_path = QtWidgets.QLineEdit()
-        self.llm_db_path = QtWidgets.QLineEdit()
-        self.poll_interval = QtWidgets.QDoubleSpinBox()
-        self.poll_interval.setDecimals(2)
-        self.poll_interval.setRange(0.05, 10.0)
-        self.poll_interval.setSingleStep(0.05)
-        self.enable_mqtt = QtWidgets.QCheckBox('启用 MQTT')
-        self.enable_sqlite = QtWidgets.QCheckBox('启用 SQLite')
-        self.no_think = QtWidgets.QCheckBox('附加 /no_think')
-        # 状态与日志
-        self.last_listened = QtWidgets.QLineEdit(); self.last_listened.setReadOnly(True)
-        self.last_reply = QtWidgets.QLineEdit(); self.last_reply.setReadOnly(True)
-        self.log = QtWidgets.QPlainTextEdit(); self.log.setReadOnly(True)
+            # 控件
+            self.api = QtWidgets.QLineEdit()
+            self.model = QtWidgets.QLineEdit()
+            self.db_path = QtWidgets.QLineEdit()  # 兼容旧字段
+            self.system_prompt_path = QtWidgets.QLineEdit()
+            self.asr_db_path = QtWidgets.QLineEdit()
+            self.llm_db_path = QtWidgets.QLineEdit()
+            self.poll_interval = QtWidgets.QDoubleSpinBox()
+            self.poll_interval.setDecimals(2)
+            self.poll_interval.setRange(0.05, 10.0)
+            self.poll_interval.setSingleStep(0.05)
+            self.enable_mqtt = QtWidgets.QCheckBox('启用 MQTT')
+            self.enable_sqlite = QtWidgets.QCheckBox('启用 SQLite')
+            self.no_think = QtWidgets.QCheckBox('附加 /no_think')
+            # 状态与日志
+            self.last_listened = QtWidgets.QLineEdit(); self.last_listened.setReadOnly(True)
+            self.last_reply = QtWidgets.QLineEdit(); self.last_reply.setReadOnly(True)
+            self.log = QtWidgets.QPlainTextEdit(); self.log.setReadOnly(True)
 
-        # 载入配置
-        cfg = read_config()
-        self.api.setText(cfg.get('lmstudio_url', 'http://localhost:1234/v1/chat/completions'))
-        self.model.setText(cfg.get('lmstudio_model', 'your-model-name'))
-        self.db_path.setText(cfg.get('db_path', 'llm_app.db'))
-        self.system_prompt_path.setText(cfg.get('system_prompt_path', ''))
-        self.asr_db_path.setText(cfg.get('asr_db_path', cfg.get('db_path', 'asr_app.db')))
-        self.llm_db_path.setText(cfg.get('llm_db_path', cfg.get('db_path', 'llm_app.db')))
-        self.poll_interval.setValue(float(cfg.get('asr_poll_interval', 0.5)))
-        self.enable_mqtt.setChecked(bool(cfg.get('enable_mqtt', True)))
-        self.enable_sqlite.setChecked(bool(cfg.get('enable_sqlite', True)))
-        self.no_think.setChecked(bool(cfg.get('no_think', False)))
+            # 载入配置
+            cfg = read_config()
+            self.api.setText(cfg.get('lmstudio_url', 'http://localhost:1234/v1/chat/completions'))
+            self.model.setText(cfg.get('lmstudio_model', 'your-model-name'))
+            self.db_path.setText(cfg.get('db_path', 'llm_app.db'))
+            self.system_prompt_path.setText(cfg.get('system_prompt_path', ''))
+            self.asr_db_path.setText(cfg.get('asr_db_path', cfg.get('db_path', 'asr_app.db')))
+            self.llm_db_path.setText(cfg.get('llm_db_path', cfg.get('db_path', 'llm_app.db')))
+            self.poll_interval.setValue(float(cfg.get('asr_poll_interval', 0.5)))
+            self.enable_mqtt.setChecked(bool(cfg.get('enable_mqtt', True)))
+            self.enable_sqlite.setChecked(bool(cfg.get('enable_sqlite', True)))
+            self.no_think.setChecked(bool(cfg.get('no_think', False)))
 
-        # 布局
-        layout.addRow('LMStudio地址:', self.api)
-        layout.addRow('模型名:', self.model)
-        layout.addRow('数据库文件(旧):', self.db_path)
-        layout.addRow('系统提示词TXT:', self._with_pick(self.system_prompt_path, '选择TXT', filter='TXT 文件 (*.txt)'))
-        layout.addRow('ASR 数据库:', self._with_pick(self.asr_db_path, '选择DB', filter='SQLite (*.db);;所有文件 (*.*)'))
-        layout.addRow('LLM 数据库:', self._with_pick(self.llm_db_path, '选择DB', filter='SQLite (*.db);;所有文件 (*.*)'))
-        layout.addRow('ASR 轮询间隔(s):', self.poll_interval)
-        layout.addRow(self.enable_mqtt)
-        layout.addRow(self.enable_sqlite)
-        layout.addRow(self.no_think)
-        layout.addRow('最近听到:', self.last_listened)
-        layout.addRow('最近回复:', self.last_reply)
-        layout.addRow('运行日志:', self.log)
+            # 布局
+            layout.addRow('LMStudio地址:', self.api)
+            layout.addRow('模型名:', self.model)
+            layout.addRow('数据库文件(旧):', self.db_path)
+            layout.addRow('系统提示词TXT:', self._with_pick(self.system_prompt_path, '选择TXT', filter='TXT 文件 (*.txt)'))
+            layout.addRow('ASR 数据库:', self._with_pick(self.asr_db_path, '选择DB', filter='SQLite (*.db);;所有文件 (*.*)'))
+            layout.addRow('LLM 数据库:', self._with_pick(self.llm_db_path, '选择DB', filter='SQLite (*.db);;所有文件 (*.*)'))
+            layout.addRow('ASR 轮询间隔(s):', self.poll_interval)
+            layout.addRow(self.enable_mqtt)
+            layout.addRow(self.enable_sqlite)
+            layout.addRow(self.no_think)
+            layout.addRow('最近听到:', self.last_listened)
+            layout.addRow('最近回复:', self.last_reply)
+            layout.addRow('运行日志:', self.log)
 
-        btns = QtWidgets.QHBoxLayout()
-        self.btn_save = QtWidgets.QPushButton('保存配置')
-        self.btn_run = QtWidgets.QPushButton('开始运行')
-        btns.addWidget(self.btn_save)
-        btns.addWidget(self.btn_run)
-        layout.addRow(btns)
+            btns = QtWidgets.QHBoxLayout()
+            self.btn_save = QtWidgets.QPushButton('保存配置')
+            self.btn_run = QtWidgets.QPushButton('开始运行')
+            self.btn_stop = QtWidgets.QPushButton('停止运行')
+            self.btn_stop.setEnabled(False)
+            btns.addWidget(self.btn_save)
+            btns.addWidget(self.btn_run)
+            btns.addWidget(self.btn_stop)
+            layout.addRow(btns)
 
-        # 事件
-        self.btn_save.clicked.connect(self.save_cfg)
-        self.btn_run.clicked.connect(self.run_llm)
-        self.event_sig.connect(self._on_event_ui)
+            # 事件
+            self.btn_save.clicked.connect(self.save_cfg)
+            self.btn_run.clicked.connect(self.run_llm)
+            self.btn_stop.clicked.connect(self.stop_llm)
+            self.event_sig.connect(self._on_event_ui)
 
-        # 运行期 worker 引用
-        self.worker = None
-        self._thread = None
+            # 运行期 worker 引用
+            self.worker = None
+            self._thread = None
 
     def _with_pick(self, line_edit: QtWidgets.QLineEdit, btn_text: str, filter: str = '所有文件 (*.*)'):
         box = QtWidgets.QHBoxLayout(); w = QtWidgets.QWidget(); w.setLayout(box)
@@ -110,6 +114,8 @@ class LLMWindow(QtWidgets.QWidget):
         if self.worker:
             try:
                 self.worker.poll_interval = float(cfg.get('asr_poll_interval', 0.5))
+                # 热更新 no_think 开关
+                self.worker.no_think = bool(cfg.get('no_think', False))
                 if hasattr(self.worker, '_normalize_path'):
                     self.worker.system_prompt_path = self.worker._normalize_path(cfg.get('system_prompt_path'))
                 else:
@@ -119,12 +125,46 @@ class LLMWindow(QtWidgets.QWidget):
         QtWidgets.QMessageBox.information(self, '保存成功', '配置已保存（路径更改已自动生效）')
 
     def run_llm(self):
+        # 避免重复启动
+        if self._thread and self._thread.is_alive():
+            QtWidgets.QMessageBox.information(self, '提示', '已在运行')
+            return
         self.btn_run.setEnabled(False)
+        self.btn_stop.setEnabled(True)
         self.worker = LlmWorker()
         self.worker.on_event = lambda ev, data: self.event_sig.emit(ev, data)
         self._thread = threading.Thread(target=self.worker.loop, daemon=True)
         self._thread.start()
         QtWidgets.QMessageBox.information(self, '已启动', 'LLM 主循环已在后台运行')
+
+    def stop_llm(self):
+        # 安全停止后台线程与 MQTT
+        try:
+            if not self._thread or not self._thread.is_alive():
+                return
+            if self.worker:
+                self.worker.stop = True
+                try:
+                    if getattr(self.worker, 'client', None):
+                        # 停止 MQTT 循环并断开
+                        try:
+                            self.worker.client.loop_stop()
+                        except Exception:
+                            pass
+                        try:
+                            self.worker.client.disconnect()
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+            # 等待线程退出
+            self._thread.join(timeout=5.0)
+        finally:
+            self.btn_run.setEnabled(True)
+            self.btn_stop.setEnabled(False)
+            self._append_log('[SYS] 已停止运行')
+            self.worker = None
+            self._thread = None
 
     def _on_event_ui(self, event: str, data: dict):
         try:
