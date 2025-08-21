@@ -2,6 +2,7 @@
   "lmstudio_url": "http://localhost:1234/v1/chat/completions",
   "lmstudio_model": "llm/gguf/qwen3-0.6b-q8_0.gguf",
   "vosk_model_path": "E:\\AITools\\model\\Vosk\\vosk-model-cn-0.22",
+  "db_path": "tts_app.db",
   "enable_mqtt": true,
   "enable_sqlite": true,
   "enable_wakeword": true,

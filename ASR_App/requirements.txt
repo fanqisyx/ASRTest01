@@ -1,0 +1,5 @@
+vosk
+pyaudio
+paho-mqtt
+PyQt5
+pypinyin

@@ -1,0 +1,85 @@
+2025-08-21 10:25
+我们现在开始修改llm_app：
+1、llm相关的有两个数据库文件、一个txt文件（三个文件都可以通过按钮选择路径的方式选择文件）：
+a、txt文件内是将要发给大模型的系统提示词，每次给大模型发送内容前，需要读取一次txt中内容；
+b、第一个是asr的数据库，这个主要是读取，用来发现用户的一些目标：
+i.循环读取，间隔时间可设置，默认0.5s。
+ii.循环读取这个数据库中的time字段，软件打开时读取一次作为原始的，当改变后，读取parameter字段，
+iii.parameter字段中是一个json格式的字符串，读取其中listened字段的内容，将内容作为用户数据加上系统提示词一起发送给大模型；
+c、第二个是llm自己的数据库，数据库中有4个字段：id、time、command、parameter：
+i.软件打开时将此数据库内容清除，后续写入也是覆盖性写入数据库第一行；
+ii.id为一个自加的数据，打开软件后归零，收到大模型回复的命令后自加；time为当前时间，精确到年月日时分秒；command，当收到大模型的回复为一个json格式的字符串时，command为json字符串中“command”字段中的值。当大模型回复不是一个json字符串时，command为“play”;parameter,当收到大模型的回复为一个json格式的字符串时，parameter的值为json字符串中“parameter”字段的值。当大模型回复不是一个json字符串时，parameter为大模型回复的所有内容；
+
+
+2025-08-21 前基础
+职责与运行方式
+
+- 职责：从任务源（MQTT 或同库 tasks 表）获取用户提问，调用 LM Studio 得到回复，产出回答给下游（MQTT 与/或 SQLite 的 TTS 任务）。
+- 运行：可命令行运行（main.py）或通过简单 GUI 后台启动主循环。
+
+## 任务来源与处理流程
+
+- 任务来源
+  - MQTT：订阅 llm/ask，收到形如 {"text": "...", "ref_id": ...} 的消息后，若启用 SQLite，则写入本地 DB 的 tasks 表（kind='llm'，status='pending'）。
+  - SQLite：主循环从本地 DB 的 tasks 表中 claim_next_task('llm') 取待处理任务。
+  - 注意：当前没有直接轮询 ASR 的数据库；若关闭 MQTT，且没有其他进程往同一 DB 写入 llm 任务，则 LLM 将无活可做。
+- 处理流程
+  - 取到任务 → 解析 text/ref_id → 如果配置 no_think=true，则在文本尾部追加 “/no_think” → 调用 LM Studio API → 解析 <think>…</think>，拆分 thinking 和 answer。
+  - 结果分发
+    - SQLite：messages 表插入一条 role='assistant' 的消息，meta 存 thinking；tasks 表插入一个 kind='tts' 的任务（text=answer, ref_id 同传）；原 llm 任务标记 done。
+    - MQTT：发布 llm/answer 和 tts/speak 两个主题。
+
+## LM Studio 调用
+
+- 接口：POST {lmstudio_url}，payload 为 Chat Completions 格式，messages 第一条为 system（来自本地 System_Prompt.txt，启动时读取一次并常驻），第二条为 user（text）。
+- 响应：从 choices[0].message.content 提取，支持可选 <think> 标签剥离。
+
+## 配置项（config.json）
+
+- 关键项：
+  - lmstudio_url，lmstudio_model
+  - db_path（本应用本地 SQLite 路径）
+  - enable_mqtt，enable_sqlite，no_think
+- 读取位置：shared/config_helper 从当前工作目录的 config.json 读取；GUI 保存也写当前工作目录的 config.json。
+  - 提示：这意味着从哪里启动进程决定了用哪个 config.json，且可能与 LLM_App 下的 config.json 不一致。
+
+## 本地数据库结构与使用
+
+- 表结构（shared/db.py）
+  - messages(id, role, content, meta, created_at)
+  - tasks(id, kind, status, ref_id, payload, result, created_at, updated_at)
+  - 索引：messages.created_at、tasks.status
+- 用法
+  - init_db 创建表；insert_message 写答复；create_task 写待处理任务；claim_next_task 原子领取 pending → processing；finish_task 标记状态并写 result。
+- 限制/注意
+  - DB_PATH 在模块导入时由 config 计算并固定；进程内动态修改 config.json 不会改变已加载的 DB 路径，需重启进程。
+  - 没有“启动清库”逻辑；id 自增（非从 0 起算、非“只保留一行”策略）。
+
+## MQTT 交互
+
+- 主题：
+  - 订阅：llm/ask
+  - 发布：llm/answer、tts/speak
+- 客户端：创建失败会静默禁用 MQTT（打印提示），避免阻塞。
+
+## GUI 功能（gui.py）
+
+- 表单项：LMStudio 地址、模型名、数据库路径、启用 MQTT、启用 SQLite、附加 /no_think。
+- 行为：
+  - 保存配置到当前工作目录的 config.json。
+  - “开始运行”按钮：init_db 后后台启动主循环线程；无停止与状态显示、无日志面板。
+
+## 其他文件
+
+- lmstudio_module.py：封装 LM Studio 调用、System_Prompt.txt 读取与 <think> 提取。
+- System_Prompt.txt：系统提示词文件，模块导入时读一次。
+- 启动脚本：启动.bat、启动_GUI.bat。
+- requirements.txt：依赖（如 requests、PyQt5、paho-mqtt 等）。
+
+## 已知限制与差异点
+
+- 未读 ASR DB、未按你新规则“轮询 ASR DB 并抽取 command/parameter”。
+- 未实现 LLM 自己的“只保留首行/覆盖写入/启动清库/自增从 0 开始”的表设计。
+- System Prompt 读取路径固定为 LLM_App 目录下的 System_Prompt.txt，GUI 不可改。
+- 配置与 DB 路径受当前工作目录影响；DB 路径在进程内固定，不会随后续保存的配置生效。
+- GUI 无日志、无状态灯、无停止按钮。

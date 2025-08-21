@@ -893,9 +893,17 @@ class SettingsDialog(QtWidgets.QDialog):
         super().__init__(parent)
         self.setWindowTitle("设置")
         self.layout = QtWidgets.QFormLayout()
+
+        # 基础配置控件
         self.lmstudio_url_edit = QtWidgets.QLineEdit()
         self.lmstudio_model_edit = QtWidgets.QLineEdit()
         self.vosk_model_path_edit = QtWidgets.QLineEdit()
+
+        # 新增：可独立启用/停用 MQTT 与 SQLite
+        self.enable_mqtt_checkbox = QtWidgets.QCheckBox("启用 MQTT（进程间消息）")
+        self.enable_sqlite_checkbox = QtWidgets.QCheckBox("启用 SQLite（本地任务队列）")
+
+        # 其他配置
         self.enable_wakeword_checkbox = QtWidgets.QCheckBox("启用唤醒词识别")
         self.wakeword_edit = QtWidgets.QLineEdit()
         self.wakeword_edit.setPlaceholderText("如：你好小明")
@@ -903,13 +911,13 @@ class SettingsDialog(QtWidgets.QDialog):
         self.enable_autostop_checkbox = QtWidgets.QCheckBox("启用定时自动停止")
         self.autostop_time_edit = QtWidgets.QLineEdit()
         self.autostop_time_edit.setPlaceholderText("秒数，如30")
-        # 新增: No Think 复选框
         self.no_think_checkbox = QtWidgets.QCheckBox("No Think（向模型追加 /no_think）")
-        # 新增：TTS延迟模式 + 固定延迟秒数
         self.tts_delay_mode_combo = QtWidgets.QComboBox()
         self.tts_delay_mode_combo.addItems(["动态计算", "固定延迟(秒)"])
         self.tts_fixed_delay_edit = QtWidgets.QLineEdit()
         self.tts_fixed_delay_edit.setPlaceholderText("固定延迟秒，默认3")
+
+        # 加载与渲染
         self.load_config()
         self.sync_config_to_ui()
 
@@ -919,6 +927,8 @@ class SettingsDialog(QtWidgets.QDialog):
             "lmstudio_url": self.lmstudio_url_edit.text(),
             "lmstudio_model": self.lmstudio_model_edit.text(),
             "vosk_model_path": self.vosk_model_path_edit.text(),
+            "enable_mqtt": self.enable_mqtt_checkbox.isChecked(),
+            "enable_sqlite": self.enable_sqlite_checkbox.isChecked(),
             "enable_wakeword": self.enable_wakeword_checkbox.isChecked(),
             "wakeword": self.wakeword_edit.text(),
             "block_wakeword_after_wake": self.block_wakeword_after_wake_checkbox.isChecked(),
@@ -936,6 +946,8 @@ class SettingsDialog(QtWidgets.QDialog):
         self.lmstudio_url_edit.setText(config.get("lmstudio_url", "http://localhost:1234/v1/chat/completions"))
         self.lmstudio_model_edit.setText(config.get("lmstudio_model", "your-model-name"))
         self.vosk_model_path_edit.setText(config.get("vosk_model_path", "E:/AITools/model/Vosk/vosk-model-cn-0.22"))
+        self.enable_mqtt_checkbox.setChecked(config.get("enable_mqtt", True))
+        self.enable_sqlite_checkbox.setChecked(config.get("enable_sqlite", True))
         self.enable_wakeword_checkbox.setChecked(config.get("enable_wakeword", False))
         self.wakeword_edit.setText(config.get("wakeword", "你好小明"))
         self.block_wakeword_after_wake_checkbox.setChecked(config.get("block_wakeword_after_wake", True))
@@ -945,9 +957,13 @@ class SettingsDialog(QtWidgets.QDialog):
         mode = config.get("tts_delay_mode", "fixed")
         self.tts_delay_mode_combo.setCurrentIndex(0 if mode == 'dynamic' else 1)
         self.tts_fixed_delay_edit.setText(str(config.get("tts_fixed_delay", 3)))
+
+        # 表单构建
         self.layout.addRow("LMStudio地址:", self.lmstudio_url_edit)
         self.layout.addRow("LMStudio模型名:", self.lmstudio_model_edit)
         self.layout.addRow("Vosk模型路径:", self.vosk_model_path_edit)
+        self.layout.addRow(self.enable_mqtt_checkbox)
+        self.layout.addRow(self.enable_sqlite_checkbox)
         self.layout.addRow(self.enable_wakeword_checkbox)
         self.layout.addRow("唤醒词:", self.wakeword_edit)
         self.layout.addRow(self.block_wakeword_after_wake_checkbox)
@@ -967,6 +983,8 @@ class SettingsDialog(QtWidgets.QDialog):
         self.lmstudio_url_edit.setText(config.get("lmstudio_url", "http://localhost:1234/v1/chat/completions"))
         self.lmstudio_model_edit.setText(config.get("lmstudio_model", "your-model-name"))
         self.vosk_model_path_edit.setText(config.get("vosk_model_path", "E:/AITools/model/Vosk/vosk-model-cn-0.22"))
+        self.enable_mqtt_checkbox.setChecked(config.get("enable_mqtt", True))
+        self.enable_sqlite_checkbox.setChecked(config.get("enable_sqlite", True))
         self.enable_wakeword_checkbox.setChecked(config.get("enable_wakeword", False))
         self.wakeword_edit.setText(config.get("wakeword", "你好小明"))
         self.block_wakeword_after_wake_checkbox.setChecked(config.get("block_wakeword_after_wake", True))
