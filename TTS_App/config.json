@@ -3,7 +3,7 @@
   "lmstudio_model": "llm/gguf/qwen3-0.6b-q8_0.gguf",
   "vosk_model_path": "E:\\AITools\\model\\Vosk\\vosk-model-cn-0.22",
   "db_path": "tts_app.db",
-  "enable_mqtt": true,
+  "enable_mqtt": false,
   "enable_sqlite": true,
   "enable_wakeword": true,
   "wakeword": "小溪",
@@ -12,5 +12,7 @@
   "autostop_time": "30",
   "no_think": false,
   "tts_delay_mode": "fixed",
-  "tts_fixed_delay": "3"
+  "tts_fixed_delay": "3",
+  "llm_db_path": "D:/快盘/Work/ChuangChi/Work Everyday/2025/2025-07-21 职院（锡职大）项目/汇总/2025-08-08/语音识别整合_v1.4/整合/LLM_App/llm_app.db",
+  "autostart": true
 }

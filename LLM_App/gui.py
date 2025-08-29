@@ -32,6 +32,7 @@ class LLMWindow(QtWidgets.QWidget):
             self.enable_mqtt = QtWidgets.QCheckBox('启用 MQTT')
             self.enable_sqlite = QtWidgets.QCheckBox('启用 SQLite')
             self.no_think = QtWidgets.QCheckBox('附加 /no_think')
+            self.autostart = QtWidgets.QCheckBox('启动自动运行')
             # 状态与日志
             self.last_listened = QtWidgets.QLineEdit(); self.last_listened.setReadOnly(True)
             self.last_reply = QtWidgets.QLineEdit(); self.last_reply.setReadOnly(True)
@@ -49,6 +50,7 @@ class LLMWindow(QtWidgets.QWidget):
             self.enable_mqtt.setChecked(bool(cfg.get('enable_mqtt', True)))
             self.enable_sqlite.setChecked(bool(cfg.get('enable_sqlite', True)))
             self.no_think.setChecked(bool(cfg.get('no_think', False)))
+            self.autostart.setChecked(bool(cfg.get('autostart', False)))
 
             # 布局
             layout.addRow('LMStudio地址:', self.api)
@@ -61,6 +63,7 @@ class LLMWindow(QtWidgets.QWidget):
             layout.addRow(self.enable_mqtt)
             layout.addRow(self.enable_sqlite)
             layout.addRow(self.no_think)
+            layout.addRow(self.autostart)
             layout.addRow('最近听到:', self.last_listened)
             layout.addRow('最近回复:', self.last_reply)
             layout.addRow('运行日志:', self.log)
@@ -108,6 +111,7 @@ class LLMWindow(QtWidgets.QWidget):
             'enable_mqtt': self.enable_mqtt.isChecked(),
             'enable_sqlite': self.enable_sqlite.isChecked(),
             'no_think': self.no_think.isChecked(),
+            'autostart': self.autostart.isChecked(),
         })
         with open('config.json','w',encoding='utf-8') as f:
             json.dump(cfg, f, ensure_ascii=False, indent=2)
@@ -127,7 +131,11 @@ class LLMWindow(QtWidgets.QWidget):
     def run_llm(self):
         # 避免重复启动
         if self._thread and self._thread.is_alive():
-            QtWidgets.QMessageBox.information(self, '提示', '已在运行')
+            # 不弹窗，写入日志
+            try:
+                self._append_log('[SYS] 已在运行')
+            except Exception:
+                pass
             return
         self.btn_run.setEnabled(False)
         self.btn_stop.setEnabled(True)
@@ -135,7 +143,11 @@ class LLMWindow(QtWidgets.QWidget):
         self.worker.on_event = lambda ev, data: self.event_sig.emit(ev, data)
         self._thread = threading.Thread(target=self.worker.loop, daemon=True)
         self._thread.start()
-        QtWidgets.QMessageBox.information(self, '已启动', 'LLM 主循环已在后台运行')
+        # 不弹窗，写入日志
+        try:
+            self._append_log('[SYS] 已启动后台运行')
+        except Exception:
+            pass
 
     def stop_llm(self):
         # 安全停止后台线程与 MQTT
@@ -165,6 +177,15 @@ class LLMWindow(QtWidgets.QWidget):
             self._append_log('[SYS] 已停止运行')
             self.worker = None
             self._thread = None
+            
+    def showEvent(self, event):
+        super().showEvent(event)
+        # 打开窗口后根据配置自动运行
+        try:
+            if self.autostart.isChecked():
+                self.run_llm()
+        except Exception:
+            pass
 
     def _on_event_ui(self, event: str, data: dict):
         try:

@@ -31,41 +31,67 @@ CREATE INDEX IF NOT EXISTS idx_events_time ON events(time);
 '''
 
 
+def _open_conn(db_path: str):
+    conn = sqlite3.connect(db_path, timeout=1.0, isolation_level=None)
+    try:
+        cur = conn.cursor()
+        cur.execute('PRAGMA journal_mode=WAL;')
+        cur.execute('PRAGMA synchronous=NORMAL;')
+        cur.execute('PRAGMA busy_timeout=1000;')
+    except Exception:
+        pass
+    return conn
+
+
 def init_llm_db():
     db_path = _get_llm_db_path()
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    with sqlite3.connect(db_path) as conn:
+    with _open_conn(db_path) as conn:
         conn.executescript(SCHEMA_SQL)
-        conn.commit()
 
 
 @contextmanager
 def _conn():
     db_path = _get_llm_db_path()
-    conn = sqlite3.connect(db_path)
+    conn = _open_conn(db_path)
     try:
         yield conn
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 def clear_llm_events():
     with _conn() as conn:
-        # 确保表存在
         conn.executescript(SCHEMA_SQL)
         cur = conn.cursor()
-        cur.execute('DELETE FROM events')
-        conn.commit()
+        try:
+            cur.execute('BEGIN IMMEDIATE')
+            cur.execute('DELETE FROM events')
+            cur.execute('COMMIT')
+        except Exception:
+            try:
+                cur.execute('ROLLBACK')
+            except Exception:
+                pass
 
 
 def overwrite_llm_first_event(ev_id: int, ev_time: str, command: str, parameter: str):
     with _conn() as conn:
-        # 确保表存在
         conn.executescript(SCHEMA_SQL)
         cur = conn.cursor()
-        cur.execute('DELETE FROM events')
-        cur.execute(
-            'INSERT INTO events(id, time, command, parameter) VALUES (?, ?, ?, ?)',
-            (ev_id, ev_time, command, parameter)
-        )
-        conn.commit()
+        try:
+            cur.execute('BEGIN IMMEDIATE')
+            cur.execute('DELETE FROM events')
+            cur.execute(
+                'INSERT INTO events(id, time, command, parameter) VALUES (?, ?, ?, ?)',
+                (ev_id, ev_time, command, parameter)
+            )
+            cur.execute('COMMIT')
+        except Exception:
+            try:
+                cur.execute('ROLLBACK')
+            except Exception:
+                pass

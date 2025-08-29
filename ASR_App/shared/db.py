@@ -32,34 +32,56 @@ CREATE INDEX IF NOT EXISTS idx_events_time ON events(time);
 '''
 
 
+def _open_conn(db_path: str):
+    """打开连接并设置快速释放相关 PRAGMA，避免长时间文件锁。"""
+    conn = sqlite3.connect(db_path, timeout=1.0, isolation_level=None)  # autocommit 模式
+    try:
+        cur = conn.cursor()
+        # WAL 可减少写锁阻塞；busy_timeout 避免立即报错
+        cur.execute('PRAGMA journal_mode=WAL;')
+        cur.execute('PRAGMA synchronous=NORMAL;')
+        cur.execute('PRAGMA busy_timeout=1000;')  # 1s 等待锁
+    except Exception:
+        pass
+    return conn
+
+
 def init_db():
-    # 每次根据当前配置动态解析 DB 路径
     db_path = _get_db_path()
-    with sqlite3.connect(db_path) as conn:
+    with _open_conn(db_path) as conn:
+        # autocommit 已启用，但仍显式执行脚本
         conn.executescript(SCHEMA_SQL)
-        conn.commit()
 
 
 @contextmanager
 def get_conn():
-    # 每次根据当前配置动态解析 DB 路径
     db_path = _get_db_path()
-    conn = sqlite3.connect(db_path)
+    conn = _open_conn(db_path)
     try:
         yield conn
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 def insert_event(ev_id: int, ev_time: str, command: str, parameter_json: str) -> None:
     """插入一条事件记录。id 由应用内自增维护。"""
     with get_conn() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            'INSERT INTO events(id, time, command, parameter) VALUES (?, ?, ?, ?)',
-            (ev_id, ev_time, command, parameter_json)
-        )
-        conn.commit()
+        try:
+            cur = conn.cursor()
+            cur.execute('BEGIN IMMEDIATE')  # 缩短写锁范围
+            cur.execute(
+                'INSERT INTO events(id, time, command, parameter) VALUES (?, ?, ?, ?)',
+                (ev_id, ev_time, command, parameter_json)
+            )
+            cur.execute('COMMIT')
+        except Exception:
+            try:
+                cur.execute('ROLLBACK')
+            except Exception:
+                pass
 
 
 def overwrite_first_event(ev_time: str, command: str, parameter_json: str) -> None:
@@ -68,18 +90,31 @@ def overwrite_first_event(ev_time: str, command: str, parameter_json: str) -> No
     """
     with get_conn() as conn:
         cur = conn.cursor()
-        # 保证最多一条：先清空表，再写入一条固定 id=1 的记录
-        cur.execute('DELETE FROM events')
-        cur.execute(
-            'INSERT INTO events(id, time, command, parameter) VALUES (1, ?, ?, ?)',
-            (ev_time, command, parameter_json)
-        )
-        conn.commit()
+        try:
+            cur.execute('BEGIN IMMEDIATE')
+            cur.execute('DELETE FROM events')
+            cur.execute(
+                'INSERT INTO events(id, time, command, parameter) VALUES (1, ?, ?, ?)',
+                (ev_time, command, parameter_json)
+            )
+            cur.execute('COMMIT')
+        except Exception:
+            try:
+                cur.execute('ROLLBACK')
+            except Exception:
+                pass
 
 
 def clear_events() -> None:
     """清空 events 表（启动时调用，等价于清除第一行）。"""
     with get_conn() as conn:
         cur = conn.cursor()
-        cur.execute('DELETE FROM events')
-        conn.commit()
+        try:
+            cur.execute('BEGIN IMMEDIATE')
+            cur.execute('DELETE FROM events')
+            cur.execute('COMMIT')
+        except Exception:
+            try:
+                cur.execute('ROLLBACK')
+            except Exception:
+                pass

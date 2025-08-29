@@ -16,6 +16,6 @@
   "wake_reply": "我在，您请说。",
   "mic_guard_file": "mic_guard.txt",
   "mic_guard_interval": 0.5,
-  "auto_start_listen": false,
+  "auto_start_listen": true,
   "wake_beep_path": "D:/快盘/Work/ChuangChi/Work Everyday/2025/2025-07-21 职院（锡职大）项目/汇总/2025-08-08/语音识别整合_v1.4/整合/ASR_App/提示音.wav"
 }
